@@ -13,7 +13,7 @@ function icon(active: IconName, inactive: IconName) {
   };
 }
 
-const TAB_BAR_CONTENT_HEIGHT = 56;
+const TAB_BAR_CONTENT_HEIGHT = 62;
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -24,15 +24,14 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textFaint,
+        // The bar adds the bottom safe-area inset as padding itself; the height must include it.
+        // Item content (padding + icon + label) needs about 52px, more than the 49px platform default.
         tabBarStyle: {
           backgroundColor: colors.tabBar,
           borderTopColor: colors.border,
           height: TAB_BAR_CONTENT_HEIGHT + insets.bottom,
-          paddingTop: 6,
-          paddingBottom: insets.bottom + 6,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600', lineHeight: 14 },
-        tabBarIconStyle: { marginBottom: 2 },
         sceneStyle: { backgroundColor: colors.background },
       }}
     >
