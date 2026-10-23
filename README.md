@@ -5,7 +5,8 @@ Private, offline subscription tracker for iOS and Android. Built with Expo SDK 5
 - `RESEARCH.md` — why this niche.
 - `PLAN.md` — features, stack, verified checklist and what could not be verified on this machine.
 - `STORE_LISTING.md` — ready-to-paste store copy, privacy answers, screenshot plan.
-- `HANDOFF.md` — the exact remaining steps that need your accounts and identity.
+- `START_HERE.md` — the beginner walkthrough: accounts, codes, three commands.
+- `HANDOFF.md` — the same steps in more detail.
 
 ## Develop
 
