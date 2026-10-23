@@ -15,18 +15,21 @@
     "verify": "npm run typecheck && npm run lint && npm test",
     "export:web": "expo export --platform web",
     "assets": "node scripts/generate-assets.mjs",
-    "legal:html": "node scripts/build-legal-html.mjs",
+    "legal:html": "node scripts/build-legal.mjs",
     "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.17",
+    "expo-asset": "~58.0.18",
     "expo-constants": "~58.0.13",
     "expo-crypto": "~58.0.7",
     "expo-dev-client": "~58.0.14",
     "expo-device": "~58.0.5",
     "expo-document-picker": "~58.0.4",
     "expo-file-system": "~58.0.10",
+    "expo-font": "~58.0.9",
     "expo-haptics": "~58.0.7",
     "expo-linking": "~58.0.14",
     "expo-localization": "~58.0.5",
@@ -49,6 +52,7 @@
     "zustand": "^5.0.16"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/react-native": "^14.1.0",
     "@types/jest": "30.0.0",
     "@types/react": "~19.3.0",
@@ -56,6 +60,7 @@
     "eslint-config-expo": "~58.0.4",
     "jest": "~30.5.2",
     "jest-expo": "~58.0.12",
+    "sharp": "^0.35.5",
     "typescript": "~6.0.3"
   },
   "jest": {
@@ -72,11 +77,16 @@
       "/dist/"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|zustand)"
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|zustand))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
     ],
     "collectCoverageFrom": [
       "src/lib/**/*.ts",
       "src/store/**/*.ts"
+    ],
+    "testMatch": [
+      "<rootDir>/__tests__/**/*.test.(ts|tsx)"
     ]
   },
   "private": true

@@ -10,6 +10,7 @@ module.exports = defineConfig([
     'e2e/test-results/*',
     'scripts/out/*',
     'legal/*',
+    'docs/*',
   ]),
   expoConfig,
 ]);

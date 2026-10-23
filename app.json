@@ -176,7 +176,9 @@
         {
           "userTrackingPermission": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

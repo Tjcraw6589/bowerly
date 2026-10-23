@@ -4,6 +4,26 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
+// Icon fonts are binary assets; render the icon name as text instead.
+jest.mock('@expo/vector-icons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  const Icon = (props: { name?: string }) => React.createElement(Text, props, props.name ?? 'icon');
+  Icon.glyphMap = {};
+  return new Proxy({}, { get: () => Icon });
+});
+
+jest.mock('expo-splash-screen', () => ({
+  preventAutoHideAsync: jest.fn(async () => true),
+  hide: jest.fn(),
+  hideAsync: jest.fn(async () => undefined),
+  setOptions: jest.fn(),
+}));
+
+jest.mock('expo-system-ui', () => ({
+  setBackgroundColorAsync: jest.fn(async () => undefined),
+}));
+
 jest.mock('react-native-google-mobile-ads', () => ({
   __esModule: true,
   default: () => ({
