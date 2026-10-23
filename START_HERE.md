@@ -52,7 +52,14 @@ Expo is the service that builds the app files for Apple and Google so you never 
 
 ## Step 3 — Google Play Console account (USD 25 once, identity check can take a few days)
 
-1. Go to https://play.google.com/console/signup, sign in with a Google account, choose **Yourself** (personal), pay, and complete the identity verification it asks for.
+Two Google rules for new personal accounts that you should know before paying (both are Google policy, not something the app can change):
+
+- **You must verify a real Android phone once.** Google requires new personal accounts to install the "Google Play Console" app on a physical, non-rooted Android phone running Android 10 or newer, sign in with the same Google account, and tap verify. It takes under a minute and only has to happen once. Any phone works: borrow a friend's or family member's for a minute (sign out of the Play Console app afterwards), or buy a cheap used Android phone, which is also the best way to test the Android build before release. Details: https://support.google.com/googleplay/android-developer/answer/14316361
+- **You must run a closed test before the public release.** Personal accounts created after November 2023 have to have at least 12 testers opted in to a closed test for 14 continuous days before Google unlocks the Production track. Friends and family count; they just need a Gmail address and to install the test build. Plan on the Android launch landing about three weeks after the iOS one for this reason.
+
+If neither is possible for you right now, publish on the App Store first (Steps 2, 8 and 10 do not depend on Google at all) and come back to Android later.
+
+1. Go to https://play.google.com/console/signup, sign in with a Google account, choose **Yourself** (personal), pay, and complete the identity verification it asks for. When it asks about an Android device, do the phone verification described above.
 2. When verified, click **Create app**. Name `SubTally`, choose **App**, choose **Free**, tick the declarations, click **Create app**.
 3. Google needs a "service account" so the build service can upload for you. Follow this guide exactly, it has screenshots: https://github.com/expo/fyi/blob/main/creating-google-service-account.md
 4. At the end you download a `.json` file. Create a folder called `credentials` inside the project folder and save the file there with exactly this name:
