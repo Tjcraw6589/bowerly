@@ -196,7 +196,16 @@
         "email": "tyjcraw@gmail.com",
         "privacyUrl": "https://tyjcraw.github.io/subtally/privacy.html",
         "termsUrl": "https://tyjcraw.github.io/subtally/terms.html"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "c58526df-0493-4257-a02f-35c04596a658"
       }
-    }
+    },
+    "owner": "tjcraw6589s-team"
   }
 }

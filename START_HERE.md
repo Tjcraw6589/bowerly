@@ -210,7 +210,7 @@ npx eas-cli@latest submit --platform android --latest
 
 ## Checklist you can tick off
 
-- [ ] Expo account and `eas init`
+- [x] Expo account and `eas init` (done 2026-10-23, project c58526df…)
 - [ ] Apple Developer paid and app created, App ID and Team ID noted, Paid Apps agreement signed
 - [ ] Google Play paid and app created, service-account JSON saved in `credentials\`
 - [ ] Privacy and terms pages live on GitHub Pages, addresses noted
