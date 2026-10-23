@@ -11,7 +11,7 @@ Status legend: `[x]` done and verified, `[ ]` not started or in progress, `[-]` 
 | Area | Free | Pro (one-time purchase) |
 |------|------|-------------------------|
 | Subscriptions | Up to 10 active subscriptions with name, price, currency, billing cycle (weekly, monthly, quarterly, yearly, or custom every N days/weeks/months/years), first bill date, category, colour, emoji, notes | Unlimited active subscriptions |
-| Renewal reminders | Local notification 0, 1, 3 or 7 days before each renewal, at a time you choose | Same |
+| Renewal reminders | Local notification on the day, or 1, 3 or 7 days before each renewal, at a time you choose | Same |
 | Free trials | Trial end date with a reminder before it converts to paid | Same |
 | Upcoming | Renewals due in the next 7, 30 and 90 days with totals | Same |
 | Insights | Monthly and yearly totals, active/paused/trial counts, most expensive | Spend by category chart and 12-month cost timeline |
@@ -44,47 +44,56 @@ Everything in the Free column is fully usable with no network connection and no 
 - [x] `PLAN.md` (this file)
 
 ### Phase 3 — Build
-- [ ] Domain types, built-in categories, service presets, currency list
-- [ ] Date and recurrence math (next bill date, upcoming dates, days until)
-- [ ] Money math (normalise any cycle to monthly and yearly cost, formatting)
-- [ ] Insights math (totals, by category, upcoming windows, most expensive, 12-month timeline)
-- [ ] CSV export and import (RFC 4180 quoting, validation, duplicate handling)
-- [ ] Review-prompt gate (good-session rules) and free-tier limits
-- [ ] Notification plan (pure) and scheduler (expo-notifications, platform-guarded)
-- [ ] Zustand store with AsyncStorage persistence, migrations and hydration flag
-- [ ] Theme system (light/dark tokens, system follow) and base components
-- [ ] Onboarding (3 steps, under 30 seconds, skippable, no ads)
-- [ ] Subscriptions tab: totals header, sort, search, list, empty state, add button
-- [ ] Add/edit subscription form with validation, presets, cycle picker, date picker, colour and emoji pickers
-- [ ] Subscription detail: next renewals, paid to date, pause/resume, cancel, delete
-- [ ] Upcoming tab: 7/30/90-day windows with totals
-- [ ] Insights tab: totals, counts, most expensive, Pro category chart and timeline
-- [ ] Settings tab: currency, theme, reminder time, notifications, Pro status, restore, export/import, categories, rate, legal, about, delete all data
-- [ ] Pro screen: feature list, live price from store, buy, restore, unavailable state
-- [ ] Categories manager (Pro)
-- [ ] Legal screens in app, `PRIVACY.md`, `TERMS.md`, `legal/privacy.html`, `legal/terms.html`
-- [ ] Ads service: consent, ATT, initialise, banner slot that never blocks content
-- [ ] Purchases service: configure, offerings, purchase, restore, entitlement listener, unavailable state
-- [ ] Rating prompt wired to good-session gate
-- [ ] App icon, adaptive Android icon (foreground, background, monochrome), splash (light and dark), notification icon, favicon
-- [ ] Unit tests for all business logic
-- [ ] Router smoke test (onboarding → add subscription → list) in Jest
-- [ ] Playwright end-to-end smoke test against the web export
+- [x] Domain types, built-in categories, 47 service presets, 40 currencies
+- [x] Date and recurrence math (anchored bill dates, next bill, upcoming, bills to date)
+- [x] Money math (normalise any cycle to monthly and yearly cost, locale-aware price parsing, formatting)
+- [x] Insights math (totals per currency, by category, upcoming windows, most expensive, 12-month timeline, paid to date)
+- [x] CSV export and import (RFC 4180 parser, validation, unknown-category creation, row-level errors)
+- [x] Review-prompt gate (good-session rules) and free-tier limits
+- [x] Notification plan (pure) and scheduler (expo-notifications, platform-guarded, under the iOS 64 limit)
+- [x] Zustand store with AsyncStorage persistence, versioning and hydration flag
+- [x] Theme system (light/dark tokens, system follow) and 20 base components (sheets, calendar, pickers, charts)
+- [x] Onboarding (3 steps, skippable, no ads; the smoke test completes it in three taps)
+- [x] Subscriptions tab: totals header, sort, search, category filter, grouped list, empty state, add button, free-limit notice
+- [x] Add/edit subscription form with validation, presets, cycle picker, calendar date picker, trial logic, colour and emoji pickers
+- [x] Subscription detail: next event, paid to date, upcoming charges, pause/resume, cancel, delete
+- [x] Upcoming tab: 7/30/90-day windows with totals and trial-end items
+- [x] Insights tab: totals, counts, most expensive, Pro category chart and timeline (locked cards for free)
+- [x] Settings tab: currency, theme, reminder time, notifications, Pro status, restore, export/import, categories, delete all data, rate, legal, support, version
+- [x] Pro screen: reason-specific headline, feature list, live price from store, buy, restore, unavailable state
+- [x] Categories manager (Pro, with Pro gate)
+- [x] Legal screens in app, `legal/privacy.md`, `legal/terms.md`, hostable `docs/privacy.html`, `docs/terms.html`
+- [x] Ads service: consent, ATT, initialise after onboarding only, banner slot that renders nothing until an ad loads
+- [x] Purchases service: configure, offerings, purchase, restore, entitlement listener, unavailable state
+- [x] Rating prompt wired to the good-session gate after saving a subscription
+- [x] App icon, adaptive Android icon (foreground, background, monochrome), splash (light and dark), notification icon, favicon, Play feature graphic (`npm run assets`)
+- [x] Unit tests for all business logic (70 tests across dates, money, stats, CSV, review gate, limits, notifications, validation, sorting, presets, store)
+- [x] Router smoke tests in Jest (4 tests: onboarding → add → list; validation; Pro unavailable; insights with data)
+- [x] Playwright end-to-end smoke test against the web export (2 tests covering every screen, theme switch, persistence, delete-all)
 
-### Phase 4 — Verify
-- [ ] `tsc --noEmit` passes with zero errors
-- [ ] `expo lint` passes with zero errors and zero warnings
-- [ ] `jest --ci` passes
-- [ ] Playwright smoke test passes
-- [ ] Walk through every screen in the browser (web build) and fix what breaks
-- [ ] Document exactly what could not be verified on this machine
+### Phase 4 — Verify (results from this machine, Windows 11, Node 24)
+- [x] `npx tsc --noEmit`: zero errors (with generated typed routes)
+- [x] `npx expo lint`: zero errors, zero warnings
+- [x] `npx jest --ci`: 9 suites, 74 tests, all passing
+- [x] `npx playwright test`: 2 passed against `dist/` served locally
+- [x] Walked every screen in a browser at a phone viewport (onboarding, list, editor with presets/calendar/trial, detail, upcoming, insights, settings, Pro, categories gate, legal) and fixed what was found (tab bar label clipping, duplicated legal date)
+- [x] Store screenshots generated at exact store sizes from the same build
+
+**Could not be verified on this machine, and why**
+- iOS simulator and Android emulator: this is a Windows PC with no Xcode and no Android SDK installed, so the native apps were not launched here. Everything native-only (AdMob banner, RevenueCat purchase, scheduled notifications, haptics, share sheet, store review prompt) is implemented against the current SDK 58 and library type definitions, is unit-tested where logic exists, and falls back cleanly where the capability is missing, but the native calls themselves ran only against test doubles. The first EAS development build (HANDOFF.md step 7) is where to confirm them.
+- Real purchases and real ads need your AdMob and RevenueCat accounts (HANDOFF.md steps 5 and 6); until the keys are entered the app shows its "store unavailable" state and uses Google's test ad unit in development builds.
 
 ### Phase 5 — Store ready
-- [ ] `STORE_LISTING.md` (titles, subtitles, keywords, descriptions for both stores)
-- [ ] Screenshot plan and generated screenshots at store sizes
-- [ ] `eas.json` with development, preview and production profiles plus submit config
-- [ ] Final `app.json` review
+- [x] `STORE_LISTING.md` (titles, subtitles, keywords, descriptions, privacy and data-safety answers, IAP review notes)
+- [x] Screenshot plan and 40 generated screenshots (`store/screenshots/`) at iPhone 6.9", 6.5", iPad 13", Android phone and 10" tablet sizes, plus `store/feature-graphic.png`
+- [x] `eas.json` with development, development-simulator, preview and production profiles plus submit config
+- [x] `app.json` reviewed: identifiers, permissions, usage strings, privacy manifest, config plugins, typed routes
 
 ### Phase 6 — Handoff
-- [ ] `HANDOFF.md` with every remaining manual step, exact commands and links
-- [ ] Setup script that fills in AdMob and RevenueCat keys and runs the EAS commands
+- [x] `HANDOFF.md` with every remaining manual step, exact commands and links
+- [x] `npm run setup` interactive script that validates and writes AdMob, RevenueCat, Apple and Google identifiers into `app.json` and `eas.json`
+
+### Removed from scope
+- [-] Bank or card linking, cloud sync, multi-device sync: deliberately excluded; they require a backend and are the weakness of the competition this app is positioned against.
+- [-] Exchange-rate conversion between currencies: would need a third-party API; totals are shown per currency instead.
+- [-] Home-screen widgets: need per-platform native extension code outside Expo's managed workflow; candidate for a later release.
