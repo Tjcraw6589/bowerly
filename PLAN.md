@@ -79,6 +79,8 @@ Everything in the Free column is fully usable with no network connection and no 
 - [x] Walked every screen in a browser at a phone viewport (onboarding, list, editor with presets/calendar/trial, detail, upcoming, insights, settings, Pro, categories gate, legal) and fixed what was found (tab bar label clipping, duplicated legal date)
 - [x] Store screenshots generated at exact store sizes from the same build
 
+- [x] Native builds compile on EAS (2026-10-23): Android `preview` APK and iOS `development-simulator` both FINISHED, confirming the config plugins for AdMob, RevenueCat, notifications, splash and icons produce a valid native project on each platform. Build pages: https://expo.dev/accounts/tjcraw6589s-team/projects/subtally/builds
+
 **Could not be verified on this machine, and why**
 - iOS simulator and Android emulator: this is a Windows PC with no Xcode and no Android SDK installed, so the native apps were not launched here. Everything native-only (AdMob banner, RevenueCat purchase, scheduled notifications, haptics, share sheet, store review prompt) is implemented against the current SDK 58 and library type definitions, is unit-tested where logic exists, and falls back cleanly where the capability is missing, but the native calls themselves ran only against test doubles. The first EAS development build (HANDOFF.md step 7) is where to confirm them.
 - Real purchases and real ads need your AdMob and RevenueCat accounts (HANDOFF.md steps 5 and 6); until the keys are entered the app shows its "store unavailable" state and uses Google's test ad unit in development builds.
