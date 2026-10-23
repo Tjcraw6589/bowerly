@@ -1,0 +1,200 @@
+{
+  "expo": {
+    "name": "SubTally",
+    "slug": "subtally",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "subtally",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F6F7FB",
+    "primaryColor": "#3D5AFE",
+    "description": "Track every subscription and catch every renewal. Private, offline, no account. Pro is a one-time purchase.",
+    "ios": {
+      "bundleIdentifier": "com.tyjcraw.subtally",
+      "supportsTablet": true,
+      "appStoreUrl": "https://apps.apple.com/app/id0000000000",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserTrackingUsageDescription": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": true,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeDeviceID",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": true,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePurchaseHistory",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          }
+        ],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "E174.1"
+            ]
+          }
+        ]
+      }
+    },
+    "android": {
+      "package": "com.tyjcraw.subtally",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.tyjcraw.subtally",
+      "adaptiveIcon": {
+        "backgroundColor": "#3D5AFE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "com.android.vending.BILLING",
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#F6F7FB",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#0F1222"
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#3D5AFE",
+          "defaultChannel": "renewals",
+          "enableRemoteNotifications": false
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "userTrackingUsageDescription": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way.",
+          "delayAppMeasurementInit": true,
+          "skAdNetworkItems": [
+            "cstr6suwn9.skadnetwork",
+            "4fzdc2evr5.skadnetwork",
+            "2fnua5tdw4.skadnetwork",
+            "ydx93a7ass.skadnetwork",
+            "p78axxw29g.skadnetwork",
+            "v72qych5uu.skadnetwork",
+            "ludvb6z3bs.skadnetwork",
+            "cp8zw746q7.skadnetwork",
+            "3sh42y64q3.skadnetwork",
+            "c6k4g5qg8m.skadnetwork",
+            "s39g8k73mm.skadnetwork",
+            "3qy4746246.skadnetwork",
+            "hs6bdukanm.skadnetwork",
+            "mlmmfzh3r3.skadnetwork",
+            "v4nxqhlyqp.skadnetwork",
+            "wzmmz9fp6w.skadnetwork",
+            "su67r6k2v3.skadnetwork",
+            "yclnxrl5pm.skadnetwork",
+            "7ug5zh24hu.skadnetwork",
+            "gta9lk7p23.skadnetwork",
+            "vutu7akeur.skadnetwork",
+            "y5ghdn5j9k.skadnetwork",
+            "v9wttpbfk9.skadnetwork",
+            "n38lu8286q.skadnetwork",
+            "47vhws6wlr.skadnetwork",
+            "kbd757ywx3.skadnetwork",
+            "9t245vhmpl.skadnetwork",
+            "a2p9lx4jpn.skadnetwork",
+            "22mmun2rn5.skadnetwork",
+            "4468km3ulz.skadnetwork",
+            "2u9pt9hc89.skadnetwork",
+            "8s468mfl3y.skadnetwork",
+            "ppxm28t8ap.skadnetwork",
+            "uw77j35x4d.skadnetwork",
+            "pwa73g5rt2.skadnetwork",
+            "578prtvx9j.skadnetwork",
+            "4dzt52r2t5.skadnetwork",
+            "tl55sbb4fm.skadnetwork",
+            "e5fvkxwrpn.skadnetwork",
+            "8c4e2ghe7u.skadnetwork",
+            "3rd42ekr43.skadnetwork",
+            "3qcr597p9d.skadnetwork"
+          ]
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "monetization": {
+        "admobBannerAndroid": "",
+        "admobBannerIos": "",
+        "revenueCatAndroid": "",
+        "revenueCatIos": "",
+        "proEntitlement": "pro",
+        "proProductId": "subtally_pro_lifetime"
+      },
+      "support": {
+        "email": "tyjcraw@gmail.com",
+        "privacyUrl": "https://tyjcraw.github.io/subtally/privacy.html",
+        "termsUrl": "https://tyjcraw.github.io/subtally/terms.html"
+      }
+    }
+  }
+}
