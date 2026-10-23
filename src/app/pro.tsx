@@ -90,6 +90,12 @@ export default function ProScreen() {
     }
   };
 
+  // Opened directly (deep link, web reload) there is no history to go back to.
+  const dismiss = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  };
+
   const storeReady = storeStatus === 'ready' && offer !== null;
   const unavailableText = !purchasesSupported
     ? 'In-app purchases are available in the iPhone and Android apps. Everything in the free version works here.'
@@ -145,7 +151,7 @@ export default function ProScreen() {
         {isPro ? (
           <>
             <Notice tone="success" title="You have Pro" message="Every feature above is unlocked on this device." />
-            <Button label="Done" fullWidth size="lg" onPress={() => router.back()} style={{ marginTop: spacing.lg }} testID="pro-done" />
+            <Button label="Done" fullWidth size="lg" onPress={dismiss} style={{ marginTop: spacing.lg }} testID="pro-done" />
           </>
         ) : (
           <>
@@ -174,7 +180,7 @@ export default function ProScreen() {
               style={{ marginTop: spacing.sm }}
               testID="pro-restore"
             />
-            <Button label="Not now" variant="ghost" fullWidth onPress={() => router.back()} testID="pro-not-now" />
+            <Button label="Not now" variant="ghost" fullWidth onPress={dismiss} testID="pro-not-now" />
           </>
         )}
       </View>

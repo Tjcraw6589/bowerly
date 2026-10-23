@@ -92,6 +92,8 @@ test.describe('SubTally smoke', () => {
     await expect(page.getByTestId('pro-screen')).toBeVisible();
     await expect(page.getByText('Take your data anywhere')).toBeVisible();
     await page.getByTestId('pro-not-now').click();
+    await expect(page.getByTestId('settings-screen')).toBeVisible();
+    await expect(page).toHaveURL(/\/settings$/);
 
     // Data persists across a full reload and onboarding is not shown again.
     await page.reload();
@@ -99,6 +101,16 @@ test.describe('SubTally smoke', () => {
     await page.getByRole('tab', { name: 'Subscriptions' }).click();
     await expect(page.getByText('Netflix')).toBeVisible();
     await expect(page.getByTestId('totals-amount')).toHaveText('$185.88');
+  });
+
+  test('the Pro screen opened directly can be dismissed', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('onboarding-skip').click();
+    await expect(page.getByTestId('subscriptions-screen')).toBeVisible();
+    await page.goto('/pro?reason=general');
+    await expect(page.getByTestId('pro-screen')).toBeVisible();
+    await page.getByTestId('pro-not-now').click();
+    await expect(page.getByTestId('subscriptions-screen')).toBeVisible();
   });
 
   test('delete all data clears the list', async ({ page }) => {
