@@ -13,7 +13,7 @@
     "ios": {
       "bundleIdentifier": "com.tyjcraw.subtally",
       "supportsTablet": true,
-      "appStoreUrl": "https://apps.apple.com/app/id0000000000",
+      "appStoreUrl": "https://apps.apple.com/app/id6827302207",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSUserTrackingUsageDescription": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."

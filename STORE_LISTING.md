@@ -23,7 +23,7 @@ Everything below is written to each store's field limits (counts are given per f
 
 **Name** (30 max, 30 used)
 ```
-SubTally: Subscription Tracker
+SubTally - Track Subscriptions
 ```
 
 **Subtitle** (30 max, 29 used)
@@ -110,7 +110,7 @@ Not collected: contact info, financial info (the app never sees card or bank dat
 
 **App name** (30 max, 30 used)
 ```
-SubTally: Subscription Tracker
+SubTally - Track Subscriptions
 ```
 
 **Short description** (80 max, 76 used)
