@@ -220,7 +220,7 @@ npx eas-cli@latest submit --platform android --latest
 - [x] Expo account and `eas init` (done 2026-10-23, project c58526df…)
 - [ ] Apple Developer paid and app created, App ID and Team ID noted, Paid Apps agreement signed
 - [ ] Google Play paid and app created, service-account JSON saved in `credentials\`
-- [ ] Privacy and terms pages live on GitHub Pages, addresses noted
+- [x] Privacy and terms pages live on GitHub Pages (https://tjcraw6589.github.io/subtally/)
 - [ ] AdMob: 4 codes noted, GDPR and IDFA messages published
 - [ ] Apple in-app purchase `subtally_pro_lifetime` created
 - [ ] RevenueCat: both apps, product, entitlement `pro`, offering, 2 keys noted
