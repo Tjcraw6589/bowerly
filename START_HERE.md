@@ -76,9 +76,9 @@ Both stores demand a public web address for a privacy policy. The pages are alre
 
 1. Create a GitHub account at https://github.com/signup if you do not have one.
 2. On GitHub click **+** (top right) → **New repository**. Name it `subtally`, leave it **Public**, do not tick any of the "initialize" boxes, click **Create repository**.
-3. In your terminal, replace `YOUR_GITHUB_USERNAME` with your actual GitHub username and run these two commands:
+3. In your terminal, replace `Tjcraw6589` with your actual GitHub username and run these two commands:
    ```
-   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/subtally.git
+   git remote add origin https://github.com/Tjcraw6589/subtally.git
    ```
    ```
    git push -u origin main
@@ -86,8 +86,8 @@ Both stores demand a public web address for a privacy policy. The pages are alre
    (If it asks you to sign in, a browser window opens; approve it.)
 4. On the repository page on GitHub: **Settings** (tab at the top) → **Pages** (left menu). Under **Build and deployment**, set Source to **Deploy from a branch**, Branch to **main**, folder to **/docs**, click **Save**.
 5. Wait two minutes, then open these in your browser to check (again replacing the username):
-   - `https://YOUR_GITHUB_USERNAME.github.io/subtally/privacy.html`
-   - `https://YOUR_GITHUB_USERNAME.github.io/subtally/terms.html`
+   - `https://Tjcraw6589.github.io/subtally/privacy.html`
+   - `https://Tjcraw6589.github.io/subtally/terms.html`
 
 **Done when:** both pages open in your browser. Write both addresses down.
 

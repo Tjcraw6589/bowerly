@@ -47,15 +47,15 @@ Both stores require a public privacy policy URL. The pages are already generated
 1. Create a GitHub account if you do not have one: https://github.com/signup
 2. Create a new public repository named `subtally` and push this project to it:
    ```bash
-   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/subtally.git
+   git remote add origin https://github.com/Tjcraw6589/subtally.git
    ```
    ```bash
    git push -u origin main
    ```
 3. In the repository: **Settings** → **Pages** → Source "Deploy from a branch" → Branch `main`, folder `/docs` → Save. (Docs: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 4. After a minute your pages are live at:
-   - `https://YOUR_GITHUB_USERNAME.github.io/subtally/privacy.html`
-   - `https://YOUR_GITHUB_USERNAME.github.io/subtally/terms.html`
+   - `https://Tjcraw6589.github.io/subtally/privacy.html`
+   - `https://Tjcraw6589.github.io/subtally/terms.html`
    You will enter these URLs in step 8.
 
 ## 5. Set up AdMob (30 min; ad serving starts after Google approves the app, usually within a day)
