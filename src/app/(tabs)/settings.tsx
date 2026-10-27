@@ -24,6 +24,7 @@ import { parseSubscriptionsCSV, subscriptionsToCSV, type ImportResult } from '@/
 import { formatTimeOfDay } from '@/lib/dates';
 import { newId } from '@/lib/ids';
 import type { ThemePreference } from '@/lib/types';
+import { showAdPrivacyOptions, usePrivacyOptionsRequired } from '@/services/ads';
 import { exportCSVFile, pickCSVFile } from '@/services/exportImport';
 import { cancelAllReminders, notificationsSupported, requestNotificationPermission } from '@/services/notifications';
 import { purchasesSupported, restorePro, usePurchasesStatus } from '@/services/purchases';
@@ -53,6 +54,7 @@ export default function SettingsScreen() {
   const resetAll = useStore((s) => s.resetAll);
   const setPro = useStore((s) => s.setPro);
   const storeStatus = usePurchasesStatus();
+  const adPrivacyRequired = usePrivacyOptionsRequired();
 
   const [sheet, setSheet] = useState<null | 'currency' | 'hour' | 'reset'>(null);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
@@ -236,6 +238,18 @@ export default function SettingsScreen() {
       <Card padded={false}>
         {rateUrl ? <Row title="Rate Bowerly" subtitle="A review helps more than you'd think" onPress={() => void Linking.openURL(rateUrl)} /> : null}
         <Row title="Privacy policy" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'privacy' } })} testID="settings-privacy" />
+        {adPrivacyRequired && !isPro ? (
+          <Row
+            title="Ad privacy choices"
+            subtitle="Change how ads may use your data"
+            onPress={() => {
+              void showAdPrivacyOptions().then((opened) => {
+                if (!opened) setFeedback({ tone: 'warning', message: 'The ad privacy form could not open. Check your connection and try again.' });
+              });
+            }}
+            testID="settings-ad-privacy"
+          />
+        ) : null}
         <Row title="Terms of use" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'terms' } })} testID="settings-terms" />
         <Row
           title="Contact support"

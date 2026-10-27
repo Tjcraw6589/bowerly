@@ -6,6 +6,14 @@ const status = createStatusStore<AdsStatus>('disabled');
 export const useAdsStatus = status.use;
 export const getAdsStatus = status.get;
 
+export function usePrivacyOptionsRequired(): boolean {
+  return false;
+}
+
+export async function showAdPrivacyOptions(): Promise<boolean> {
+  return false;
+}
+
 export function loadAdsModule(): null {
   return null;
 }

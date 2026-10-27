@@ -12,6 +12,10 @@ const status = createStatusStore<AdsStatus>('idle');
 export const useAdsStatus = status.use;
 export const getAdsStatus = status.get;
 
+/** True when the user's region requires a way to change ad consent later (EEA, UK, Switzerland). */
+const privacyOptions = createStatusStore<boolean>(false);
+export const usePrivacyOptionsRequired = privacyOptions.use;
+
 let adsModule: AdsModule | null | undefined;
 
 /** Loads the native module lazily so Expo Go and test runs never touch it. */
@@ -52,6 +56,28 @@ async function requestTrackingIfNeeded(): Promise<void> {
   }
 }
 
+async function refreshPrivacyOptions(mod: AdsModule): Promise<void> {
+  try {
+    const info = await mod.AdsConsent.getConsentInfo();
+    privacyOptions.set(info.privacyOptionsRequirementStatus === mod.AdsConsentPrivacyOptionsRequirementStatus.REQUIRED);
+  } catch {
+    privacyOptions.set(false);
+  }
+}
+
+/** Opens Google's consent form so the user can change their ad choices. Resolves false if it could not open. */
+export async function showAdPrivacyOptions(): Promise<boolean> {
+  const mod = loadAdsModule();
+  if (!mod) return false;
+  try {
+    await mod.AdsConsent.showPrivacyOptionsForm();
+    await refreshPrivacyOptions(mod);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 let initPromise: Promise<void> | null = null;
 
 /**
@@ -74,6 +100,7 @@ export function initializeAds(isPro: boolean): Promise<void> {
       } catch {
         // Consent errors are not fatal; the SDK may still serve ads where allowed.
       }
+      await refreshPrivacyOptions(mod);
       const { canRequestAds } = await mod.AdsConsent.getConsentInfo();
       if (!canRequestAds) {
         status.set('disabled');
