@@ -218,13 +218,13 @@ npx eas-cli@latest submit --platform android --latest
 ## Checklist you can tick off
 
 - [x] Expo account and `eas init` (done 2026-10-23, project c58526df…)
-- [ ] Apple Developer paid and app created, App ID and Team ID noted, Paid Apps agreement signed
+- [x] Apple Developer paid and app created, App ID and Team ID noted, Paid Apps agreement signed (done; agreement pending with Apple)
 - [ ] Google Play paid and app created, service-account JSON saved in `credentials\`
 - [x] Privacy and terms pages live on GitHub Pages (https://tjcraw6589.github.io/subtally/)
-- [ ] AdMob: 4 codes noted, GDPR and IDFA messages published
-- [ ] Apple in-app purchase `subtally_pro_lifetime` created
-- [ ] RevenueCat: both apps, product, entitlement `pro`, offering, 2 keys noted
-- [ ] `npm run setup` says everything is filled in; committed and pushed
-- [ ] `eas build --platform all --profile production` finished
+- [x] AdMob: 4 codes noted, GDPR and IDFA messages published (account under review; not needed for the first iOS release)
+- [x] Apple in-app purchase `subtally_pro_lifetime` created (Billnest Pro, 4.99 USD, Ready for Review)
+- [x] RevenueCat: both apps, product, entitlement `pro`, offering, 2 keys noted (iOS app, product, entitlement and offering done; Android later)
+- [x] `npm run setup` says everything is filled in; committed and pushed (iOS values written directly; AdMob still blank)
+- [x] `eas build --platform all --profile production` finished (iOS builds 3 and 4 finished; Android waits for a Play account)
 - [ ] Android: first `.aab` uploaded by hand, Pro product created, listing complete, sent for review
-- [ ] iOS: `eas submit`, listing complete, IAP attached, App Privacy published, submitted
+- [x] iOS: `eas submit`, listing complete, IAP attached, App Privacy published, submitted (uploaded; listing, privacy, age rating, pricing done; screenshots and final Submit remain)
