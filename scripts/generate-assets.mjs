@@ -77,7 +77,7 @@ const feature = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="50
   ${gradientDefs}
   <rect width="1024" height="500" fill="url(#g)"/>
   <g transform="translate(90,70) scale(0.36)">${mark('#FFFFFF')}</g>
-  <text x="470" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="92" font-weight="800" fill="#FFFFFF" letter-spacing="-2">SubTally</text>
+  <text x="470" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="92" font-weight="800" fill="#FFFFFF" letter-spacing="-2">Billnest</text>
   <text x="472" y="285" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#E6EAFF">Every subscription, one tally.</text>
   <text x="472" y="345" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" fill="#C7CEFF">Private · Offline · No account · One-time Pro</text>
 </svg>`;

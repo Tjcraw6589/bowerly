@@ -32,7 +32,7 @@ Decision owner: the build agent (per brief, no user decision required)
 
 ## Positioning
 
-- Name: **SubTally**. Store title: "SubTally: Subscription Tracker".
+- Name: **Billnest**. Store title: "Billnest: Subscription Tracker".
 - One-liner: "Track every subscription, catch every renewal. Private, offline, no account, no bank link, and Pro is a one-time purchase."
 - Differentiators to lead with in ASO copy: offline and private; renewal reminders; one-time Pro (never a subscription); light and dark mode; CSV export.
 

@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
  * way a new user would: onboarding, first subscription, every tab, Pro screen,
  * dark mode, and persistence across a reload.
  */
-test.describe('SubTally smoke', () => {
+test.describe('Billnest smoke', () => {
   test('first run through every screen', async ({ page }) => {
     await page.goto('/');
 
@@ -76,7 +76,7 @@ test.describe('SubTally smoke', () => {
     await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(246, 247, 251)');
     await page.getByTestId('settings-privacy').click();
     await expect(page.getByTestId('legal-screen')).toBeVisible();
-    await expect(page.getByText('SubTally has no accounts, no sign-in, no cloud sync', { exact: false })).toBeVisible();
+    await expect(page.getByText('Billnest has no accounts, no sign-in, no cloud sync', { exact: false })).toBeVisible();
     await page.getByTestId('header-dismiss').click();
 
     // Pro screen on the web reports that the store is unavailable and keeps the free app working.
@@ -120,7 +120,7 @@ test.describe('SubTally smoke', () => {
     await page.getByTestId('name-field').fill('Gym');
     await page.getByTestId('price-field').fill('40');
     await page.getByTestId('editor-save').click();
-    await expect(page.getByText('Gym')).toBeVisible();
+    await expect(page.getByText('Gym', { exact: true })).toBeVisible();
 
     await page.getByRole('tab', { name: 'Settings' }).click();
     await page.getByTestId('settings-reset').click();

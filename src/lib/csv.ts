@@ -134,7 +134,7 @@ function unitFromText(text: string): CycleUnit | null {
 }
 
 /**
- * Parses a CSV exported by SubTally (or a hand-made one with at least `name` and `price` columns).
+ * Parses a CSV exported by Billnest (or a hand-made one with at least `name` and `price` columns).
  * Unknown categories are created. Rows with problems are skipped and reported, never imported half-formed.
  */
 export function parseSubscriptionsCSV(

@@ -1,11 +1,11 @@
-# START HERE — getting SubTally into the app stores, for someone who has never done this
+# START HERE — getting Billnest into the app stores, for someone who has never done this
 
 You do not need to understand the code. The app is finished and tested. What is left is paperwork: creating accounts in your name, pasting a few ID codes into a setup script, and running three commands. Budget about half a day of clicking spread over a week of waiting for approvals.
 
 Every command below is typed into a terminal opened in the project folder. To open one: press the Windows key, type `cmd`, press Enter, then type:
 
 ```
-cd C:\Users\Tyjcr\Documents\SubTally
+cd C:\Users\Tyjcr\Documents\Billnest
 ```
 
 Costs: Apple charges USD 99 per year. Google charges USD 25 once. Everything else is free.
@@ -38,9 +38,9 @@ Expo is the service that builds the app files for Apple and Google so you never 
 2. Once approved, go to https://appstoreconnect.apple.com/ and sign in.
 3. Click **Apps**, then the **+** button, then **New App**. Fill in:
    - Platforms: **iOS**
-   - Name: **SubTally**
+   - Name: **Billnest**
    - Primary language: **English (U.S.)**
-   - Bundle ID: click the dropdown. If `com.tyjcraw.subtally` is not there, choose "Register a new bundle ID", pick **Explicit**, type `com.tyjcraw.subtally`, description `SubTally`, and come back.
+   - Bundle ID: click the dropdown. If `com.tyjcraw.subtally` is not there, choose "Register a new bundle ID", pick **Explicit**, type `com.tyjcraw.subtally`, description `Billnest`, and come back.
    - SKU: **subtally**
    - User Access: **Full Access**
 4. Write down two codes:
@@ -60,15 +60,15 @@ Two Google rules for new personal accounts that you should know before paying (b
 If neither is possible for you right now, publish on the App Store first (Steps 2, 8 and 10 do not depend on Google at all) and come back to Android later.
 
 1. Go to https://play.google.com/console/signup, sign in with a Google account, choose **Yourself** (personal), pay, and complete the identity verification it asks for. When it asks about an Android device, do the phone verification described above.
-2. When verified, click **Create app**. Name `SubTally`, choose **App**, choose **Free**, tick the declarations, click **Create app**.
+2. When verified, click **Create app**. Name `Billnest`, choose **App**, choose **Free**, tick the declarations, click **Create app**.
 3. Google needs a "service account" so the build service can upload for you. Follow this guide exactly, it has screenshots: https://github.com/expo/fyi/blob/main/creating-google-service-account.md
 4. At the end you download a `.json` file. Create a folder called `credentials` inside the project folder and save the file there with exactly this name:
    ```
-   C:\Users\Tyjcr\Documents\SubTally\credentials\google-play-service-account.json
+   C:\Users\Tyjcr\Documents\Billnest\credentials\google-play-service-account.json
    ```
    This file is a secret. It is already ignored by git so it will never be uploaded anywhere.
 
-**Done when:** SubTally shows in your Play Console and the JSON file is in the `credentials` folder.
+**Done when:** Billnest shows in your Play Console and the JSON file is in the `credentials` folder.
 
 ## Step 4 — Put the privacy policy online (free, 15 minutes)
 
@@ -94,29 +94,29 @@ Both stores demand a public web address for a privacy policy. The pages are alre
 ## Step 5 — AdMob, the ads in the free version (free, 30 minutes)
 
 1. Go to https://apps.admob.com/ and sign in with a Google account. Follow the sign-up prompts (it will ask for a payments profile, that is where ad money gets paid).
-2. Left menu **Apps** → **Add app**. Platform **Android**. When asked "Is the app listed on a supported app store?" choose **No**. App name `SubTally`. Click **Add**.
+2. Left menu **Apps** → **Add app**. Platform **Android**. When asked "Is the app listed on a supported app store?" choose **No**. App name `Billnest`. Click **Add**.
 3. On the next screen copy the **App ID**. It looks like `ca-app-pub-1234567890123456~1234567890` (note the squiggle `~`). Write it down as **AdMob Android App ID**.
 4. Click **Ad units** → **Add ad unit** → **Banner**. Name it `Android Banner`, click **Create ad unit**, and copy the **Ad unit ID**. It looks like `ca-app-pub-1234567890123456/1234567890` (note the slash `/`). Write it down as **AdMob Android banner ID**.
 5. Repeat steps 2 to 4 choosing platform **iOS**. Write down the **AdMob iOS App ID** and **AdMob iOS banner ID**.
-6. Left menu **Privacy & messaging**. Click **GDPR** → **Create message** → select both SubTally apps → keep the defaults → **Publish**. Then click **IDFA** → **Create message** → select the iOS app → **Publish**. This makes the app legally ask European users for consent and iOS users for tracking permission; the app already knows how to show these.
+6. Left menu **Privacy & messaging**. Click **GDPR** → **Create message** → select both Billnest apps → keep the defaults → **Publish**. Then click **IDFA** → **Create message** → select the iOS app → **Publish**. This makes the app legally ask European users for consent and iOS users for tracking permission; the app already knows how to show these.
 
 **Done when:** you have four AdMob codes written down (two with `~`, two with `/`).
 
 ## Step 6 — RevenueCat and the Pro purchase (free, 45 minutes)
 
-The app sells one thing: a one-time "SubTally Pro" unlock. It must be created in both stores with this exact product ID: `subtally_pro_lifetime`. RevenueCat is the free service that checks who has bought it.
+The app sells one thing: a one-time "Billnest Pro" unlock. It must be created in both stores with this exact product ID: `subtally_pro_lifetime`. RevenueCat is the free service that checks who has bought it.
 
 **6a. Create the product at Apple**
 1. App Store Connect → your app → left menu **Monetization** → **In-App Purchases** → **+**.
-2. Type: **Non-Consumable**. Reference Name: `SubTally Pro`. Product ID: `subtally_pro_lifetime`. Click **Create**.
-3. Set a price (around USD 6.99 is normal for this kind of app). Under **App Store Localization** add English: Display Name `SubTally Pro`, Description `Remove ads, unlimited subscriptions, export`.
+2. Type: **Non-Consumable**. Reference Name: `Billnest Pro`. Product ID: `subtally_pro_lifetime`. Click **Create**.
+3. Set a price (around USD 6.99 is normal for this kind of app). Under **App Store Localization** add English: Display Name `Billnest Pro`, Description `Remove ads, unlimited subscriptions, export`.
 4. Under **Review Information** upload any screenshot from `store\screenshots\iphone-6.9\07-pro.png` and paste this note: "One-time unlock. Open Settings, tap See Pro, tap Unlock Pro with a sandbox account. After purchase the banner disappears and Insights shows the category and timeline charts." Click **Save**.
 
 **6b. Create the product at Google**
-Google only lets you do this after a first build is uploaded (Step 9). Come back then: Play Console → your app → **Monetize** → **Products** → **In-app products** → **Create product**. Product ID `subtally_pro_lifetime`, name `SubTally Pro`, description `Remove ads, unlimited subscriptions, export`, set a price, **Save**, then **Activate**.
+Google only lets you do this after a first build is uploaded (Step 9). Come back then: Play Console → your app → **Monetize** → **Products** → **In-app products** → **Create product**. Product ID `subtally_pro_lifetime`, name `Billnest Pro`, description `Remove ads, unlimited subscriptions, export`, set a price, **Save**, then **Activate**.
 
 **6c. RevenueCat**
-1. Sign up at https://app.revenuecat.com/signup and create a project named `SubTally`.
+1. Sign up at https://app.revenuecat.com/signup and create a project named `Billnest`.
 2. **Apps & providers** → **+ New** → **App Store**. Bundle ID `com.tyjcraw.subtally`. It asks for an "In-App Purchase Key" from Apple; follow the link it shows you (or https://www.revenuecat.com/docs/service-credentials/itunesconnect-app-specific-shared-secret/in-app-purchase-key-configuration) and upload it.
 3. **Apps & providers** → **+ New** → **Play Store**. Package `com.tyjcraw.subtally`. It asks for Play service credentials; follow https://www.revenuecat.com/docs/service-credentials/creating-play-service-credentials (you can reuse the service account from Step 3 if you give it the permissions that page lists).
 4. **Product catalog** → **Products** → **+ New**. Add `subtally_pro_lifetime` for the App Store app, and again for the Play Store app.

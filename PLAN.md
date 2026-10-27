@@ -1,10 +1,10 @@
-# SubTally — build plan
+# Billnest — build plan
 
 Status legend: `[x]` done and verified, `[ ]` not started or in progress, `[-]` removed from scope (reason given).
 
 ## App
 
-**SubTally: Subscription Tracker.** Track every recurring charge, see what it costs per month and per year, and get a reminder before each renewal and before each free trial ends. Fully offline, no account, no bank linking. Free with a small banner ad; a one-time Pro purchase removes ads and unlocks power features.
+**Billnest: Subscription Tracker.** Track every recurring charge, see what it costs per month and per year, and get a reminder before each renewal and before each free trial ends. Fully offline, no account, no bank linking. Free with a small banner ad; a one-time Pro purchase removes ads and unlocks power features.
 
 ## Core feature set
 

@@ -201,7 +201,7 @@ export default function SubscriptionDetailScreen() {
       <ConfirmSheet
         visible={confirm === 'cancel'}
         title={`Mark ${sub.name} as cancelled?`}
-        message="SubTally keeps it in your history with the total you paid, stops the reminders and leaves it out of your totals."
+        message="Billnest keeps it in your history with the total you paid, stops the reminders and leaves it out of your totals."
         confirmLabel="Mark cancelled"
         onConfirm={() => changeStatus('cancelled')}
         onCancel={() => setConfirm(null)}

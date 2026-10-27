@@ -39,7 +39,7 @@ const adsPlugin = app.expo.plugins.find((p) => Array.isArray(p) && p[0] === 'rea
 const monetization = (app.expo.extra.monetization ??= {});
 const support = (app.expo.extra.support ??= {});
 
-console.log('\nSubTally setup. Press Enter to keep the value in brackets.\n');
+console.log('\nBillnest setup. Press Enter to keep the value in brackets.\n');
 
 console.log('— AdMob (apps.admob.com → Apps → App settings → App ID; Ad units → Banner) —');
 adsPlugin[1].androidAppId = await ask('AdMob Android App ID', adsPlugin[1].androidAppId, admobApp);

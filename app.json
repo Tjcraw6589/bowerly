@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SubTally",
+    "name": "Billnest",
     "slug": "subtally",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,7 @@
       "appStoreUrl": "https://apps.apple.com/app/id6827302207",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSUserTrackingUsageDescription": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
+        "NSUserTrackingUsageDescription": "Billnest shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
       },
       "privacyManifests": {
         "NSPrivacyTracking": true,
@@ -123,7 +123,7 @@
         {
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
-          "userTrackingUsageDescription": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way.",
+          "userTrackingUsageDescription": "Billnest shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way.",
           "delayAppMeasurementInit": true,
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
@@ -174,7 +174,7 @@
       [
         "expo-tracking-transparency",
         {
-          "userTrackingPermission": "SubTally shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
+          "userTrackingPermission": "Billnest shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
         }
       ],
       "expo-asset",

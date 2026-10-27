@@ -81,7 +81,7 @@ export default function SettingsScreen() {
       updateSettings({ notificationsEnabled: true });
       setFeedback({ tone: 'success', message: 'Reminders are on. You can change the time below.' });
     } else {
-      setFeedback({ tone: 'warning', message: 'Notifications are turned off for SubTally in your system settings.' });
+      setFeedback({ tone: 'warning', message: 'Notifications are turned off for Billnest in your system settings.' });
       if (Platform.OS !== 'web') Linking.openSettings().catch(() => undefined);
     }
   };
@@ -151,7 +151,7 @@ export default function SettingsScreen() {
         </View>
       ) : null}
 
-      <SectionHeader title="SubTally Pro" first={!feedback} />
+      <SectionHeader title="Billnest Pro" first={!feedback} />
       <Card testID="pro-card">
         {isPro ? (
           <View style={styles.proRow}>
@@ -234,13 +234,13 @@ export default function SettingsScreen() {
 
       <SectionHeader title="About" />
       <Card padded={false}>
-        {rateUrl ? <Row title="Rate SubTally" subtitle="A review helps more than you'd think" onPress={() => void Linking.openURL(rateUrl)} /> : null}
+        {rateUrl ? <Row title="Rate Billnest" subtitle="A review helps more than you'd think" onPress={() => void Linking.openURL(rateUrl)} /> : null}
         <Row title="Privacy policy" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'privacy' } })} testID="settings-privacy" />
         <Row title="Terms of use" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'terms' } })} testID="settings-terms" />
         <Row
           title="Contact support"
           subtitle={SUPPORT_EMAIL}
-          onPress={() => void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=SubTally%20${APP_VERSION}`)}
+          onPress={() => void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=Billnest%20${APP_VERSION}`)}
         />
         <Row title="Version" value={APP_VERSION} chevron={false} last />
       </Card>

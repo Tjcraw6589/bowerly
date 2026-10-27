@@ -72,7 +72,7 @@ export default function SubscriptionsScreen() {
           <EmptyState
             emoji="🧾"
             title="No subscriptions yet"
-            body="Add the services you pay for and SubTally will tally the cost and remind you before each renewal."
+            body="Add the services you pay for and Billnest will tally the cost and remind you before each renewal."
             actionLabel="Add your first subscription"
             onAction={onAdd}
             testID="empty-state"

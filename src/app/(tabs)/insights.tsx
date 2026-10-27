@@ -131,7 +131,7 @@ export default function InsightsScreen() {
         <Ionicons name="information-circle-outline" size={16} color={colors.textMuted} style={{ marginRight: spacing.xs }} />
         <AppText variant="caption" tone="muted" style={styles.flex}>
           Totals cover active subscriptions in {currency}. Free trials are excluded until they convert; other currencies are listed separately
-          because SubTally never looks up exchange rates.
+          because Billnest never looks up exchange rates.
         </AppText>
       </View>
     </Screen>

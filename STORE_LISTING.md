@@ -1,4 +1,4 @@
-# SubTally — store listing copy and assets
+# Billnest — store listing copy and assets
 
 Everything below is written to each store's field limits (counts are given per field). Paste as-is.
 
@@ -6,7 +6,7 @@ Everything below is written to each store's field limits (counts are given per f
 
 | Field | Value |
 |-------|-------|
-| App name | SubTally |
+| App name | Billnest |
 | iOS bundle identifier | `com.tyjcraw.subtally` |
 | Android package | `com.tyjcraw.subtally` |
 | Version | 1.0.0 |
@@ -23,7 +23,7 @@ Everything below is written to each store's field limits (counts are given per f
 
 **Name** (30 max, 30 used)
 ```
-SubTally - Track Subscriptions
+Billnest - Track Subscriptions
 ```
 
 **Subtitle** (30 max, 29 used)
@@ -43,10 +43,10 @@ renewal,reminder,recurring,bills,budget,trial,expenses,manager,spending,money,ca
 
 **Description** (4000 max)
 ```
-SubTally is the simple way to see every subscription you pay for, what they really cost per month and per year, and when each one renews next. It works entirely on your phone: no account, no bank connection, no cloud.
+Billnest is the simple way to see every subscription you pay for, what they really cost per month and per year, and when each one renews next. It works entirely on your phone: no account, no bank connection, no cloud.
 
 WHY PEOPLE SWITCH TO SUBTALLY
-• It never asks for your bank login. You type in what you pay and SubTally does the maths.
+• It never asks for your bank login. You type in what you pay and Billnest does the maths.
 • Pro is a one-time purchase. A subscription tracker should not be another subscription.
 • Works offline, anywhere. Your data stays on your device unless you export it.
 • Free-trial reminders. Add the trial end date and get a nudge before it turns into a charge.
@@ -59,7 +59,7 @@ WHAT YOU GET
 • Quick add with presets for popular services, plus any custom service with its own emoji and colour.
 • Pause, resume, cancel or delete, and see what you have paid so far.
 • Light and dark mode.
-• Any currency. Subscriptions in other currencies are shown separately; SubTally never guesses exchange rates.
+• Any currency. Subscriptions in other currencies are shown separately; Billnest never guesses exchange rates.
 
 SUBTALLY PRO (ONE-TIME PURCHASE)
 • No ads.
@@ -70,7 +70,7 @@ SUBTALLY PRO (ONE-TIME PURCHASE)
 • Restore on any device signed in to the same App Store account.
 
 PRIVACY
-SubTally has no servers and no accounts. Subscription data never leaves your phone. The free version shows a small banner advert through Google AdMob; buying Pro removes it completely. Full policy inside the app and at the privacy policy link.
+Billnest has no servers and no accounts. Subscription data never leaves your phone. The free version shows a small banner advert through Google AdMob; buying Pro removes it completely. Full policy inside the app and at the privacy policy link.
 
 Made by one independent developer. Questions and ideas: tyjcraw@gmail.com
 ```
@@ -99,10 +99,10 @@ Not collected: contact info, financial info (the app never sees card or bank dat
 | Field | Value |
 |-------|-------|
 | Type | Non-Consumable |
-| Reference name | SubTally Pro |
+| Reference name | Billnest Pro |
 | Product ID | `subtally_pro_lifetime` |
 | Price tier | Tier matching about USD 6.99 (your call; nothing in the app assumes a price) |
-| Display name | SubTally Pro |
+| Display name | Billnest Pro |
 | Description (45) | Remove ads, unlimited subscriptions, export |
 | Review notes | One-time unlock. Open Settings → "See Pro" → "Unlock Pro" with a sandbox account. After purchase the banner disappears, the Insights tab shows the category and timeline charts, and Settings → Export/Import/Manage categories open instead of showing the Pro screen. |
 
@@ -110,7 +110,7 @@ Not collected: contact info, financial info (the app never sees card or bank dat
 
 **App name** (30 max, 30 used)
 ```
-SubTally - Track Subscriptions
+Billnest - Track Subscriptions
 ```
 
 **Short description** (80 max, 76 used)
@@ -120,10 +120,10 @@ Track subscriptions and renewals offline. Private, no account. One-time Pro.
 
 **Full description** (4000 max)
 ```
-SubTally shows every subscription you pay for, what they really cost per month and per year, and when each one renews next. Everything stays on your phone: no account, no bank connection, no cloud.
+Billnest shows every subscription you pay for, what they really cost per month and per year, and when each one renews next. Everything stays on your phone: no account, no bank connection, no cloud.
 
-<b>Why people switch to SubTally</b>
-• No bank login, ever. Type in what you pay and SubTally does the maths.
+<b>Why people switch to Billnest</b>
+• No bank login, ever. Type in what you pay and Billnest does the maths.
 • Pro is a one-time purchase. A subscription tracker should not be another subscription.
 • Works offline. Your data never leaves your device unless you export it.
 • Free-trial reminders. Add the trial end date and get a nudge before it becomes a charge.
@@ -136,9 +136,9 @@ SubTally shows every subscription you pay for, what they really cost per month a
 • Quick add with presets for popular services, or any custom service with its own emoji and colour.
 • Pause, resume, cancel or delete, and see what you have paid so far.
 • Light and dark theme, Material You friendly monochrome icon.
-• Any currency. Other currencies are shown separately; SubTally never guesses exchange rates.
+• Any currency. Other currencies are shown separately; Billnest never guesses exchange rates.
 
-<b>SubTally Pro (one-time purchase)</b>
+<b>Billnest Pro (one-time purchase)</b>
 • No ads.
 • Unlimited active subscriptions (free tracks up to 10).
 • Spend by category and a 12-month projection of what will leave your account.
@@ -147,7 +147,7 @@ SubTally shows every subscription you pay for, what they really cost per month a
 • Restore on any device signed in to the same Google account.
 
 <b>Privacy</b>
-SubTally has no servers and no accounts. Subscription data never leaves your phone. The free version shows a small banner ad through Google AdMob; Pro removes it completely. The full policy is inside the app and at the privacy policy link.
+Billnest has no servers and no accounts. Subscription data never leaves your phone. The free version shows a small banner ad through Google AdMob; Pro removes it completely. The full policy is inside the app and at the privacy policy link.
 
 Made by one independent developer. Questions and ideas: tyjcraw@gmail.com
 ```
@@ -159,7 +159,7 @@ Made by one independent developer. Questions and ideas: tyjcraw@gmail.com
 | App category | Finance |
 | Tags | Budgeting, Personal finance, Productivity |
 | Contains ads | Yes |
-| In-app products | Yes: `subtally_pro_lifetime` (one-time, "SubTally Pro") |
+| In-app products | Yes: `subtally_pro_lifetime` (one-time, "Billnest Pro") |
 | Content rating (IARC) | Answer "No" to every content question; result Everyone / PEGI 3 |
 | Target audience | 18 and over (simplest; the app is not designed for children) |
 | News app | No |

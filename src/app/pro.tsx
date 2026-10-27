@@ -18,13 +18,13 @@ import { useTheme } from '@/theme/useTheme';
 const HEADLINES: Record<string, { title: string; body: string }> = {
   limit: {
     title: 'You have outgrown the free plan',
-    body: `Free SubTally tracks up to ${FREE_ACTIVE_LIMIT} active subscriptions. Pro removes the limit for good.`,
+    body: `Free Billnest tracks up to ${FREE_ACTIVE_LIMIT} active subscriptions. Pro removes the limit for good.`,
   },
   export: { title: 'Take your data anywhere', body: 'Export every subscription to a CSV you can open in any spreadsheet.' },
   import: { title: 'Bring your data in', body: 'Import subscriptions from a spreadsheet or another tracker in seconds.' },
   categories: { title: 'Organise it your way', body: 'Create, rename and recolour categories to match how you think about your spending.' },
   insights: { title: 'See the full picture', body: 'Category breakdowns and a 12-month timeline show exactly where your money goes.' },
-  general: { title: 'SubTally Pro', body: 'One payment. No subscription to track your subscriptions.' },
+  general: { title: 'Billnest Pro', body: 'One payment. No subscription to track your subscriptions.' },
 };
 
 const FEATURES: { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }[] = [

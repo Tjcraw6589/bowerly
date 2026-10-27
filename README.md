@@ -1,4 +1,4 @@
-# SubTally
+# Billnest
 
 Private, offline subscription tracker for iOS and Android. Built with Expo SDK 58, React Native, TypeScript (strict) and Expo Router; ships through EAS Build.
 

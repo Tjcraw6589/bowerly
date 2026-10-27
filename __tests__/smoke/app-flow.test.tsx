@@ -13,7 +13,7 @@ async function press(testID: string): Promise<void> {
   });
 }
 
-describe('SubTally end-to-end (router)', () => {
+describe('Billnest end-to-end (router)', () => {
   beforeEach(() => resetStore({ onboardingComplete: false }));
 
   test('onboarding → empty list → add a subscription → it appears with totals', async () => {

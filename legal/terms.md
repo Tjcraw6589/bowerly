@@ -1,28 +1,28 @@
-# SubTally Terms of Use
+# Billnest Terms of Use
 
 Last updated: 22 October 2026
 
-These terms apply to the SubTally mobile application ("the app"). By installing or using the app you agree to them. If you do not agree, please do not use the app.
+These terms apply to the Billnest mobile application ("the app"). By installing or using the app you agree to them. If you do not agree, please do not use the app.
 
-## What SubTally is
+## What Billnest is
 
-SubTally is a personal tool for recording recurring payments and estimating what they cost. It works from the information you type in. It does not connect to your bank, does not verify charges and does not know whether a service actually billed you.
+Billnest is a personal tool for recording recurring payments and estimating what they cost. It works from the information you type in. It does not connect to your bank, does not verify charges and does not know whether a service actually billed you.
 
 ## Licence
 
 You are granted a personal, non-transferable, non-exclusive licence to use the app on devices you own or control, subject to the rules of the app store you downloaded it from. You may not copy, modify, reverse engineer, resell or redistribute the app except where the law expressly allows it.
 
-## SubTally Pro
+## Billnest Pro
 
-SubTally Pro is a one-time in-app purchase that removes adverts and unlocks additional features. It is not a subscription and there is no recurring charge. The purchase is processed and billed by Apple or Google under their terms, and refunds are handled by them according to their policies. You can restore Pro on any device signed in to the same store account using "Restore purchases" in the app.
+Billnest Pro is a one-time in-app purchase that removes adverts and unlocks additional features. It is not a subscription and there is no recurring charge. The purchase is processed and billed by Apple or Google under their terms, and refunds are handled by them according to their policies. You can restore Pro on any device signed in to the same store account using "Restore purchases" in the app.
 
 ## Accuracy and estimates
 
-Totals, projections and reminders are calculated from the dates, prices and billing cycles you enter. Monthly and yearly figures for non-monthly cycles are estimates. SubTally is not financial, tax or legal advice and is no substitute for checking your statements. You are responsible for cancelling services you no longer want with the providers themselves; a reminder from SubTally does not cancel anything.
+Totals, projections and reminders are calculated from the dates, prices and billing cycles you enter. Monthly and yearly figures for non-monthly cycles are estimates. Billnest is not financial, tax or legal advice and is no substitute for checking your statements. You are responsible for cancelling services you no longer want with the providers themselves; a reminder from Billnest does not cancel anything.
 
 ## Reminders
 
-Reminders rely on your device's notification system and settings. Delivery can be delayed or prevented by low-power modes, system restrictions, device restarts or permissions you have withheld. Do not rely on SubTally as your only safeguard against unwanted charges.
+Reminders rely on your device's notification system and settings. Delivery can be delayed or prevented by low-power modes, system restrictions, device restarts or permissions you have withheld. Do not rely on Billnest as your only safeguard against unwanted charges.
 
 ## Your data
 
@@ -38,7 +38,7 @@ The app is provided "as is" and "as available", without warranties of any kind, 
 
 ## Limitation of liability
 
-To the fullest extent permitted by law, the developer is not liable for any indirect, incidental, special or consequential loss, including charges you incur from services you did not cancel, arising from your use of or inability to use the app. Where liability cannot be excluded, it is limited to the amount you paid for SubTally Pro, if any.
+To the fullest extent permitted by law, the developer is not liable for any indirect, incidental, special or consequential loss, including charges you incur from services you did not cancel, arising from your use of or inability to use the app. Where liability cannot be excluded, it is limited to the amount you paid for Billnest Pro, if any.
 
 ## Changes
 

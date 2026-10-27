@@ -136,7 +136,7 @@ export default function OnboardingScreen() {
         <View style={styles.body}>
           <AppText variant="title">Never miss a renewal</AppText>
           <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
-            SubTally can remind you a few days before each charge and before a free trial turns into a paid plan. Reminders are
+            Billnest can remind you a few days before each charge and before a free trial turns into a paid plan. Reminders are
             scheduled on your device; nothing is sent anywhere.
           </AppText>
           <AppText variant="small" tone="muted" style={{ marginTop: spacing.xl, marginBottom: spacing.sm }}>
@@ -160,7 +160,7 @@ export default function OnboardingScreen() {
           ) : null}
           {permissionDenied ? (
             <AppText variant="caption" tone="warning" style={{ marginTop: spacing.md }}>
-              Notifications are off for SubTally. You can turn them on any time from Settings.
+              Notifications are off for Billnest. You can turn them on any time from Settings.
             </AppText>
           ) : null}
         </View>

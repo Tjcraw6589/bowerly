@@ -40,7 +40,7 @@ function page(title, body) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SubTally ${title}</title>
+<title>Billnest ${title}</title>
 <style>
   :root { color-scheme: light dark; --bg:#F6F7FB; --fg:#0F1222; --muted:#5B6075; --link:#3D5AFE; --card:#FFFFFF; --border:#E3E6F0; }
   @media (prefers-color-scheme: dark) { :root { --bg:#0F1222; --fg:#F3F4FA; --muted:#A0A6C0; --link:#8396FF; --card:#181C30; --border:#2A2F4A; } }
@@ -60,7 +60,7 @@ function page(title, body) {
 <article>
 ${body}
 </article>
-<footer>SubTally · Private, offline subscription tracking</footer>
+<footer>Billnest · Private, offline subscription tracking</footer>
 </main>
 </body>
 </html>
@@ -83,7 +83,7 @@ writeFileSync(
   join(htmlDir, 'index.html'),
   page(
     'Legal',
-    '<h1>SubTally</h1><p>Private, offline subscription tracking for iPhone and Android.</p><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Use</a></li></ul>',
+    '<h1>Billnest</h1><p>Private, offline subscription tracking for iPhone and Android.</p><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Use</a></li></ul>',
   ),
 );
 

@@ -10,7 +10,7 @@ export default function NotFoundScreen() {
       <EmptyState
         emoji="🧭"
         title="That page doesn't exist"
-        body="The link you followed points somewhere SubTally doesn't know about."
+        body="The link you followed points somewhere Billnest doesn't know about."
         actionLabel="Back to subscriptions"
         onAction={() => router.replace('/')}
       />
