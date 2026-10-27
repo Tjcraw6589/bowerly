@@ -109,7 +109,7 @@ The app sells one thing: a one-time "Billnest Pro" unlock. It must be created in
 **6a. Create the product at Apple**
 1. App Store Connect → your app → left menu **Monetization** → **In-App Purchases** → **+**.
 2. Type: **Non-Consumable**. Reference Name: `Billnest Pro`. Product ID: `subtally_pro_lifetime`. Click **Create**.
-3. Set a price (around USD 6.99 is normal for this kind of app). Under **App Store Localization** add English: Display Name `Billnest Pro`, Description `Remove ads, unlimited subscriptions, export`.
+3. Price: USD 4.99 (already set; Apple fills in other countries). Under **App Store Localization** add English: Display Name `Billnest Pro`, Description `Remove ads, unlimited subscriptions, export`.
 4. Under **Review Information** upload any screenshot from `store\screenshots\iphone-6.9\07-pro.png` and paste this note: "One-time unlock. Open Settings, tap See Pro, tap Unlock Pro with a sandbox account. After purchase the banner disappears and Insights shows the category and timeline charts." Click **Save**.
 
 **6b. Create the product at Google**

@@ -11,22 +11,38 @@ export interface ProOffer {
 export type PurchaseOutcome = 'purchased' | 'cancelled' | 'failed';
 export type RestoreOutcome = 'restored' | 'none' | 'failed';
 
-const status = createStatusStore<StoreStatus>('unavailable');
+/**
+ * Store screenshots are rendered from the web build. The screenshot script sets this
+ * global (it is never set in the shipped apps or the normal web preview) so the Pro
+ * screen is captured in the same "ready to buy" state an iPhone user sees, showing the
+ * real App Store price, instead of the web-only "store unavailable" notice.
+ */
+interface StorePreview {
+  priceString: string;
+}
+
+function storePreview(): StorePreview | null {
+  const value = (globalThis as { __BILLNEST_STORE_PREVIEW__?: StorePreview }).__BILLNEST_STORE_PREVIEW__;
+  return value && typeof value.priceString === 'string' ? value : null;
+}
+
+const status = createStatusStore<StoreStatus>(storePreview() ? 'ready' : 'unavailable');
 export const usePurchasesStatus = status.use;
 export const getPurchasesStatus = status.get;
 
 // In-app purchases only exist in the native store builds. The web preview shows
 // the Pro screen in its "store unavailable" state.
 export async function configurePurchases(_onProChange: (isPro: boolean) => void): Promise<void> {
-  status.set('unavailable');
+  status.set(storePreview() ? 'ready' : 'unavailable');
 }
 
 export async function fetchProOffer(): Promise<ProOffer | null> {
-  return null;
+  const preview = storePreview();
+  return preview ? { priceString: preview.priceString, productId: 'subtally_pro_lifetime', title: 'Billnest Pro' } : null;
 }
 
 export async function purchasePro(): Promise<PurchaseOutcome> {
-  return 'failed';
+  return storePreview() ? 'cancelled' : 'failed';
 }
 
 export async function restorePro(): Promise<RestoreOutcome> {

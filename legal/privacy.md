@@ -1,6 +1,6 @@
 # Billnest Privacy Policy
 
-Last updated: 22 October 2026
+Last updated: 26 October 2026
 
 Billnest is a subscription tracker built to keep your information on your own device. This policy explains what the app does and does not do with data.
 

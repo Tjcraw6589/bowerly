@@ -139,6 +139,10 @@ try {
         colorScheme: shot.theme,
       });
       const page = await context.newPage();
+      // Show the Pro screen as an iPhone user sees it (real App Store price), not the web-only notice.
+      await page.addInitScript(() => {
+        window.__BILLNEST_STORE_PREVIEW__ = { priceString: '$4.99' };
+      });
       if (!shot.fresh) {
         const state = persistedState(shot.theme, shot.pro);
         await page.addInitScript((value) => {

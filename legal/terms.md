@@ -1,6 +1,6 @@
 # Billnest Terms of Use
 
-Last updated: 22 October 2026
+Last updated: 26 October 2026
 
 These terms apply to the Billnest mobile application ("the app"). By installing or using the app you agree to them. If you do not agree, please do not use the app.
 

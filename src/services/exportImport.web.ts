@@ -12,7 +12,7 @@ export async function exportCSVFile(csv: string, now = new Date()): Promise<Expo
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `subtally-export-${toISODate(now)}.csv`;
+    a.download = `billnest-export-${toISODate(now)}.csv`;
     document.body.appendChild(a);
     a.click();
     a.remove();
