@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
+import { NestMark } from '@/components/NestMark';
 import { OptionSheet } from '@/components/OptionSheet';
 import { Screen } from '@/components/Screen';
 import { useLocale } from '@/hooks/useLocale';
@@ -21,7 +22,7 @@ const STEP_COUNT = 3;
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { colors, spacing, radius } = useTheme();
+  const { colors, spacing } = useTheme();
   const { languageTag } = useLocale();
   const settings = useStore((s) => s.settings);
   const updateSettings = useStore((s) => s.updateSettings);
@@ -84,11 +85,9 @@ export default function OnboardingScreen() {
 
       {step === 0 ? (
         <View style={styles.body}>
-          <View style={[styles.logo, { backgroundColor: colors.primary, borderRadius: radius.xl }]}>
-            <Text style={styles.logoText}>Σ</Text>
-          </View>
+          <NestMark size={96} />
           <AppText variant="title" style={{ marginTop: spacing.xl }}>
-            Every subscription, one tally.
+            Every subscription, one nest.
           </AppText>
           <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
             See exactly what you pay each month and year, and get a nudge before anything renews.
@@ -207,8 +206,6 @@ const styles = StyleSheet.create({
   dots: { flexDirection: 'row', alignItems: 'center' },
   dot: { height: 8, borderRadius: 4, marginRight: 6 },
   body: { flex: 1, justifyContent: 'center' },
-  logo: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center' },
-  logoText: { color: '#FFFFFF', fontSize: 40, fontWeight: '800', lineHeight: 48 },
   feature: { flexDirection: 'row', alignItems: 'center' },
   featureIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap' },

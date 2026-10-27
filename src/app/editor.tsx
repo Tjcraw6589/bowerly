@@ -75,7 +75,7 @@ function defaultDraft(settings: Settings, today: Date): SubscriptionDraft {
     cycle: { every: 1, unit: 'month' },
     firstBillDate: toISODate(today),
     categoryId: OTHER_CATEGORY_ID,
-    color: '#3D5AFE',
+    color: '#1F7A5C',
     emoji: '📦',
     notes: '',
     reminderDaysBefore: 1,
@@ -390,7 +390,7 @@ export default function EditorScreen() {
         value={draft.categoryId}
         onSelect={(categoryId) => {
           const c = findCategory(categories, categoryId);
-          setDraft((d) => ({ ...d, categoryId, color: d.color === '#3D5AFE' && d.emoji === '📦' ? c.color : d.color, emoji: d.emoji === '📦' ? c.emoji : d.emoji }));
+          setDraft((d) => ({ ...d, categoryId, color: d.color === '#1F7A5C' && d.emoji === '📦' ? c.color : d.color, emoji: d.emoji === '📦' ? c.emoji : d.emoji }));
         }}
         testID="category-sheet"
       />

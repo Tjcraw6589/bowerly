@@ -7,8 +7,8 @@
     "scheme": "subtally",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#F6F7FB",
-    "primaryColor": "#3D5AFE",
+    "backgroundColor": "#F6F5F0",
+    "primaryColor": "#1F7A5C",
     "description": "Track every subscription and catch every renewal. Private, offline, no account. Pro is a one-time purchase.",
     "ios": {
       "bundleIdentifier": "com.tyjcraw.subtally",
@@ -71,7 +71,7 @@
       "package": "com.tyjcraw.subtally",
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.tyjcraw.subtally",
       "adaptiveIcon": {
-        "backgroundColor": "#3D5AFE",
+        "backgroundColor": "#1F7A5C",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -102,10 +102,10 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#F6F7FB",
+          "backgroundColor": "#F6F5F0",
           "dark": {
             "image": "./assets/splash-icon-dark.png",
-            "backgroundColor": "#0F1222"
+            "backgroundColor": "#0F1613"
           }
         }
       ],
@@ -113,7 +113,7 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#3D5AFE",
+          "color": "#1F7A5C",
           "defaultChannel": "renewals",
           "enableRemoteNotifications": false
         }

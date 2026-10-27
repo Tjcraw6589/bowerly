@@ -11,27 +11,33 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'assets');
 mkdirSync(out, { recursive: true });
 
-const PRIMARY = '#3D5AFE';
-const PRIMARY_DARK = '#2A3FD6';
-const LIGHT_BG = '#F6F7FB';
-const DARK_BG = '#0F1222';
+const PRIMARY = '#1F7A5C';
+const PRIMARY_DARK = '#155C45';
+const LIGHT_BG = '#F6F5F0';
+const DARK_BG = '#0F1613';
 
 /**
- * The mark: four tally strokes and a diagonal "fifth" stroke, drawn inside a
- * 1000x1000 box. `color` is the stroke colour; `scale` shrinks the mark
- * toward the centre (adaptive icons need everything inside the inner 66%).
+ * The Billnest mark: a bill (receipt card) sitting in a nest (bowl), drawn inside a
+ * 1000x1000 box.
+ *  - fg: colour of the nest and the bill outline/lines
+ *  - billFill: fill of the bill (usually the background colour, for contrast)
+ *  - scale: shrinks the mark toward the centre (adaptive icons need the inner 66%)
+ *  - mono: single-colour variant (Android themed icon, notification icon)
  */
-function mark(color, scale = 1, strokeWidth = 86) {
-  const cx = 500;
-  const cy = 500;
-  const half = 290 * scale;
-  const xs = [-210, -70, 70, 210].map((x) => cx + x * scale);
-  const sw = strokeWidth * scale;
-  const bars = xs
-    .map((x) => `<line x1="${x}" y1="${cy - half}" x2="${x}" y2="${cy + half}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`)
+function mark(fg, billFill, scale = 1, mono = false) {
+  const bill = mono
+    ? `<rect x="365" y="215" width="270" height="340" rx="42" fill="none" stroke="${fg}" stroke-width="30"/>`
+    : `<rect x="365" y="215" width="270" height="340" rx="42" fill="${billFill}" stroke="${fg}" stroke-width="26"/>`;
+  const lines = [300, 370, 440]
+    .map((y, i) => `<line x1="420" y1="${y}" x2="${i === 2 ? 530 : 580}" y2="${y}" stroke="${fg}" stroke-width="26" stroke-linecap="round"/>`)
     .join('');
-  const diag = `<line x1="${cx - 330 * scale}" y1="${cy + 230 * scale}" x2="${cx + 330 * scale}" y2="${cy - 230 * scale}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
-  return bars + diag;
+  const nest = `<path d="M 150 520 A 350 350 0 0 0 850 520 Z" fill="${fg}"/>`;
+  const weave = mono
+    ? ''
+    : `<path d="M 215 600 Q 500 760 785 600" fill="none" stroke="${billFill}" stroke-width="20" stroke-linecap="round" opacity="0.55"/>
+       <path d="M 290 690 Q 500 790 710 690" fill="none" stroke="${billFill}" stroke-width="20" stroke-linecap="round" opacity="0.55"/>`;
+  const body = `<g transform="rotate(-7 500 430)">${bill}${lines}</g>${nest}${weave}`;
+  return `<g transform="translate(500 500) scale(${scale}) translate(-500 -500)">${body}</g>`;
 }
 
 function svg(size, body, background = 'none') {
@@ -55,31 +61,31 @@ async function render(name, size, body, background = 'none') {
 }
 
 // 1. App icon: opaque, square; the stores round the corners themselves.
-await render('icon.png', 1024, `${gradientDefs}<rect width="1000" height="1000" fill="url(#g)"/>${mark('#FFFFFF')}`);
+await render('icon.png', 1024, `${gradientDefs}<rect width="1000" height="1000" fill="url(#g)"/>${mark('#FFFFFF', PRIMARY)}`);
 
 // 2. Android adaptive icon layers. Foreground content stays inside the central safe zone.
-await render('android-icon-foreground.png', 1024, mark('#FFFFFF', 0.62));
+await render('android-icon-foreground.png', 1024, mark('#FFFFFF', PRIMARY, 0.62));
 await render('android-icon-background.png', 1024, `${gradientDefs}<rect width="1000" height="1000" fill="url(#g)"/>`);
-await render('android-icon-monochrome.png', 1024, mark('#FFFFFF', 0.62));
+await render('android-icon-monochrome.png', 1024, mark('#FFFFFF', '#000000', 0.62, true));
 
 // 3. Splash images: transparent, mark only; the plugin places them on the configured background.
-await render('splash-icon.png', 1024, mark(PRIMARY, 0.9, 80));
-await render('splash-icon-dark.png', 1024, mark('#8396FF', 0.9, 80));
+await render('splash-icon.png', 1024, mark(PRIMARY, LIGHT_BG, 0.9));
+await render('splash-icon-dark.png', 1024, mark('#4CC39A', DARK_BG, 0.9));
 
 // 4. Android notification icon: white on transparent, 96x96.
-await render('notification-icon.png', 96, mark('#FFFFFF', 1, 110));
+await render('notification-icon.png', 96, mark('#FFFFFF', '#000000', 1.1, true));
 
 // 5. Favicon for the web preview.
-await render('favicon.png', 64, `${gradientDefs}<rect width="1000" height="1000" rx="180" fill="url(#g)"/>${mark('#FFFFFF', 1, 110)}`);
+await render('favicon.png', 64, `${gradientDefs}<rect width="1000" height="1000" rx="180" fill="url(#g)"/>${mark('#FFFFFF', PRIMARY, 1.05)}`);
 
 // 6. Store-listing feature graphic source (Google Play wants 1024x500).
 const feature = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
   ${gradientDefs}
   <rect width="1024" height="500" fill="url(#g)"/>
-  <g transform="translate(90,70) scale(0.36)">${mark('#FFFFFF')}</g>
+  <g transform="translate(90,70) scale(0.36)">${mark('#FFFFFF', PRIMARY)}</g>
   <text x="470" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="92" font-weight="800" fill="#FFFFFF" letter-spacing="-2">Billnest</text>
-  <text x="472" y="285" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#E6EAFF">Every subscription, one tally.</text>
-  <text x="472" y="345" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" fill="#C7CEFF">Private · Offline · No account · One-time Pro</text>
+  <text x="472" y="285" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#DCF0E6">Every subscription, one nest.</text>
+  <text x="472" y="345" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" fill="#BFE3D2">Private · Offline · No account · One-time Pro</text>
 </svg>`;
 mkdirSync(join(root, 'store'), { recursive: true });
 await sharp(Buffer.from(feature)).png().toFile(join(root, 'store', 'feature-graphic.png'));

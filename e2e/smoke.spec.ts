@@ -12,7 +12,7 @@ test.describe('Billnest smoke', () => {
 
     // Onboarding: three steps, under thirty seconds.
     await expect(page.getByTestId('onboarding')).toBeVisible();
-    await expect(page.getByText('Every subscription, one tally.')).toBeVisible();
+    await expect(page.getByText('Every subscription, one nest.')).toBeVisible();
     await page.getByTestId('onboarding-next').click();
     await expect(page.getByText('Which currency do you mostly pay in?')).toBeVisible();
     await page.getByTestId('currency-chip-EUR').click();
@@ -71,9 +71,9 @@ test.describe('Billnest smoke', () => {
     await page.getByRole('tab', { name: 'Settings' }).click();
     await expect(page.getByTestId('settings-screen')).toBeVisible();
     await page.getByTestId('theme-dark').click();
-    await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(15, 18, 34)');
+    await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(15, 22, 19)');
     await page.getByTestId('theme-light').click();
-    await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(246, 247, 251)');
+    await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(246, 245, 240)');
     await page.getByTestId('settings-privacy').click();
     await expect(page.getByTestId('legal-screen')).toBeVisible();
     await expect(page.getByText('Billnest has no accounts, no sign-in, no cloud sync', { exact: false })).toBeVisible();
