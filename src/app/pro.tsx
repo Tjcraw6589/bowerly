@@ -11,7 +11,16 @@ import { Notice } from '@/components/Notice';
 import { Screen } from '@/components/Screen';
 import { FREE_ACTIVE_LIMIT } from '@/lib/limits';
 import { successHaptic } from '@/services/haptics';
-import { fetchProOffer, type ProOffer, purchasePro, purchasesSupported, restorePro, usePurchasesStatus } from '@/services/purchases';
+import {
+  billingStoreName,
+  fetchProOffer,
+  type ProOffer,
+  purchasePro,
+  purchasesSupported,
+  restorePro,
+  storeAccountName,
+  usePurchasesStatus,
+} from '@/services/purchases';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
@@ -168,7 +177,7 @@ export default function ProScreen() {
               testID="pro-buy"
             />
             <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.sm }}>
-              One-time purchase. Not a subscription. Billed by Apple or Google; restore on any device signed in to the same store account.
+              One-time purchase. Not a subscription. Billed by {billingStoreName()}; restore on any device signed in to the same {storeAccountName()}.
             </AppText>
             <Button
               label="Restore purchases"

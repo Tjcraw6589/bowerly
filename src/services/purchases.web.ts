@@ -19,6 +19,8 @@ export type RestoreOutcome = 'restored' | 'none' | 'failed';
  */
 interface StorePreview {
   priceString: string;
+  /** Which store's wording to show; set per screenshot set. */
+  store?: 'apple' | 'google';
 }
 
 function storePreview(): StorePreview | null {
@@ -50,3 +52,11 @@ export async function restorePro(): Promise<RestoreOutcome> {
 }
 
 export const purchasesSupported = false;
+
+export function billingStoreName(): string {
+  return storePreview()?.store === 'google' ? 'Google Play' : 'Apple';
+}
+
+export function storeAccountName(): string {
+  return storePreview()?.store === 'google' ? 'Google account' : 'Apple Account';
+}

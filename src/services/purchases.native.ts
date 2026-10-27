@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { IS_EXPO_GO, PRO_ENTITLEMENT, PRO_PRODUCT_ID, revenueCatApiKey } from '@/config/monetization';
 
 import { createStatusStore } from './statusStore';
@@ -124,3 +126,13 @@ export async function restorePro(): Promise<RestoreOutcome> {
 }
 
 export const purchasesSupported = true;
+
+/** The store that bills this install, named the way the user knows it. */
+export function billingStoreName(): string {
+  return Platform.OS === 'android' ? 'Google Play' : 'Apple';
+}
+
+/** What the user signs in with to restore purchases on another device. */
+export function storeAccountName(): string {
+  return Platform.OS === 'android' ? 'Google account' : 'Apple Account';
+}
