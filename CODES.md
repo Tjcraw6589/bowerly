@@ -13,8 +13,8 @@ Fill in each line as you get it, then paste this whole file to me (or run `npm r
 | AdMob iOS banner ad unit ID | same app → Ad units → the Banner unit | ca-app-pub-1234567890123456/0987654321 | |
 | RevenueCat Apple public key | app.revenuecat.com → Project settings → API keys → App specific keys | appl_xxxxxxxxxxxxxxxx | appl_gYgfPCOGaRTCkjjeZXXOquYKlTK |
 | RevenueCat Google public key | same page | goog_xxxxxxxxxxxxxxxx | |
-| Privacy policy URL | GitHub Pages, after Step 4 | https://tjcraw6589.github.io/subtally/privacy.html | |
-| Terms URL | GitHub Pages, after Step 4 | https://tjcraw6589.github.io/subtally/terms.html | |
+| Privacy policy URL | GitHub Pages, after Step 4 | https://tjcraw6589.github.io/bowerly/privacy.html | |
+| Terms URL | GitHub Pages, after Step 4 | https://tjcraw6589.github.io/bowerly/terms.html | |
 | GitHub username | github.com, top right | | |
 
 Do NOT paste here: passwords, the Google Play service-account JSON contents, Apple in-app purchase keys (.p8 files), or RevenueCat secret keys. Those stay in the services' own dashboards or in the ignored `credentials` folder.

@@ -78,7 +78,7 @@ Both stores demand a public web address for a privacy policy. The pages are alre
 2. On GitHub click **+** (top right) → **New repository**. Name it `subtally`, leave it **Public**, do not tick any of the "initialize" boxes, click **Create repository**.
 3. In your terminal, replace `Tjcraw6589` with your actual GitHub username and run these two commands:
    ```
-   git remote add origin https://github.com/Tjcraw6589/subtally.git
+   git remote add origin https://github.com/Tjcraw6589/bowerly.git
    ```
    ```
    git push -u origin main
@@ -86,8 +86,8 @@ Both stores demand a public web address for a privacy policy. The pages are alre
    (If it asks you to sign in, a browser window opens; approve it.)
 4. On the repository page on GitHub: **Settings** (tab at the top) → **Pages** (left menu). Under **Build and deployment**, set Source to **Deploy from a branch**, Branch to **main**, folder to **/docs**, click **Save**.
 5. Wait two minutes, then open these in your browser to check (again replacing the username):
-   - `https://Tjcraw6589.github.io/subtally/privacy.html`
-   - `https://Tjcraw6589.github.io/subtally/terms.html`
+   - `https://Tjcraw6589.github.io/bowerly/privacy.html`
+   - `https://Tjcraw6589.github.io/bowerly/terms.html`
 
 **Done when:** both pages open in your browser. Write both addresses down.
 
@@ -220,7 +220,7 @@ npx eas-cli@latest submit --platform android --latest
 - [x] Expo account and `eas init` (done 2026-10-23, project c58526df…)
 - [x] Apple Developer paid and app created, App ID and Team ID noted, Paid Apps agreement signed (done; agreement pending with Apple)
 - [ ] Google Play paid and app created, service-account JSON saved in `credentials\`
-- [x] Privacy and terms pages live on GitHub Pages (https://tjcraw6589.github.io/subtally/)
+- [x] Privacy and terms pages live on GitHub Pages (https://tjcraw6589.github.io/bowerly/)
 - [x] AdMob: payment profile complete, ID verified; EU consent message "Bowerly EU consent" published 2026-10-27 (with a Do not consent button; the app's Settings shows "Ad privacy choices" where the law requires it); no IDFA explainer needed because the app shows Apple's tracking prompt itself; iOS app renamed Bowerly (App ID `ca-app-pub-6745854970750685~1639195277`) with banner unit "Bowerly iOS banner" (`ca-app-pub-6745854970750685/6551012115`). Account and app approval finish after the app is live: then AdMob → Apps → Bowerly → App settings → Add store (step below).
 - [x] Apple in-app purchase `subtally_pro_lifetime` created (Bowerly Pro, 4.99 USD, Ready for Review)
 - [x] RevenueCat: both apps, product, entitlement `pro`, offering, 2 keys noted (iOS app, product, entitlement and offering done; Android later)

@@ -15,8 +15,8 @@ Everything below fits each store's field limits (counts are given per field). Pa
 | Price | Free, with one in-app purchase (`subtally_pro_lifetime`, non-consumable, USD 4.99) |
 | Contains ads | Yes (banner only, free tier) |
 | Age rating | 4+ / Everyone |
-| Privacy policy URL | https://tjcraw6589.github.io/subtally/privacy.html |
-| Support URL | https://tjcraw6589.github.io/subtally/ |
+| Privacy policy URL | https://tjcraw6589.github.io/bowerly/privacy.html |
+| Support URL | https://tjcraw6589.github.io/bowerly/ |
 | Support email | tyjcraw@gmail.com |
 
 The name "Bowerly" was checked against the App Store on 26 October 2026 and no app uses it.
