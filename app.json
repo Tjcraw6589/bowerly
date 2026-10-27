@@ -122,7 +122,7 @@
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "iosAppId": "ca-app-pub-6745854970750685~1639195277",
           "userTrackingUsageDescription": "Bowerly shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your bills and subscriptions never leave your device either way.",
           "delayAppMeasurementInit": true,
           "skAdNetworkItems": [
@@ -186,7 +186,7 @@
     "extra": {
       "monetization": {
         "admobBannerAndroid": "",
-        "admobBannerIos": "",
+        "admobBannerIos": "ca-app-pub-6745854970750685/6551012115",
         "revenueCatAndroid": "",
         "revenueCatIos": "appl_gYgfPCOGaRTCkjjeZXXOquYKlTK",
         "proEntitlement": "pro",

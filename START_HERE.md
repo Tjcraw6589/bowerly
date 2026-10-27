@@ -221,10 +221,10 @@ npx eas-cli@latest submit --platform android --latest
 - [x] Apple Developer paid and app created, App ID and Team ID noted, Paid Apps agreement signed (done; agreement pending with Apple)
 - [ ] Google Play paid and app created, service-account JSON saved in `credentials\`
 - [x] Privacy and terms pages live on GitHub Pages (https://tjcraw6589.github.io/subtally/)
-- [x] AdMob: 4 codes noted, GDPR and IDFA messages published (account under review; not needed for the first iOS release)
+- [x] AdMob: payment profile complete, ID verified, GDPR and IDFA messages published; iOS app renamed Bowerly (App ID `ca-app-pub-6745854970750685~1639195277`) with banner unit "Bowerly iOS banner" (`ca-app-pub-6745854970750685/6551012115`). Account and app approval finish after the app is live: then AdMob → Apps → Bowerly → App settings → Add store (step below).
 - [x] Apple in-app purchase `subtally_pro_lifetime` created (Bowerly Pro, 4.99 USD, Ready for Review)
 - [x] RevenueCat: both apps, product, entitlement `pro`, offering, 2 keys noted (iOS app, product, entitlement and offering done; Android later)
-- [x] `npm run setup` says everything is filled in; committed and pushed (iOS values written directly; AdMob still blank)
+- [x] `npm run setup` says everything is filled in; committed and pushed (iOS values written directly, including the real iOS AdMob IDs from build 7 on)
 - [x] `eas build --platform all --profile production` finished (iOS builds 3 and 4 finished; Android waits for a Play account)
 - [ ] Android: first `.aab` uploaded by hand, Pro product created, listing complete, sent for review
 - [x] iOS: `eas submit`, listing complete, IAP attached, App Privacy published, submitted (uploaded; listing, privacy, age rating, pricing done; screenshots and final Submit remain)
