@@ -16,6 +16,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 
 const DEVICES = [
   { name: 'iphone-6.9', width: 440, height: 956, scale: 3, note: 'iPhone 6.9-inch 1320x2868' },
+  { name: 'iphone-6.3', width: 402, height: 874, scale: 3, note: 'iPhone 6.3-inch 1206x2622 (App Store Connect marks this size required)' },
   { name: 'iphone-6.5', width: 428, height: 926, scale: 3, note: 'iPhone 6.5-inch 1284x2778' },
   { name: 'ipad-13', width: 1032, height: 1376, scale: 2, note: 'iPad 13-inch 2064x2752' },
   { name: 'android-phone', width: 360, height: 640, scale: 3, note: 'Android phone 1080x1920' },
@@ -150,7 +151,9 @@ const server = spawn(process.execPath, [join(root, 'scripts', 'serve-dist.mjs'),
 try {
   await waitForServer(BASE);
   const browser = await chromium.launch();
-  for (const device of DEVICES) {
+  // Optional: `npm run screenshots -- --only=iphone-6.3` regenerates one device folder.
+  const only = process.argv.find((a) => a.startsWith('--only='))?.slice('--only='.length);
+  for (const device of DEVICES.filter((d) => !only || d.name === only)) {
     const dir = join(root, 'store', 'screenshots', device.name);
     mkdirSync(dir, { recursive: true });
     for (const shot of SHOTS) {
