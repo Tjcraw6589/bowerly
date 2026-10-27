@@ -1,11 +1,15 @@
 import { OTHER_CATEGORY_ID } from './categories';
 import { isValidISODate, toISODate } from './dates';
 import { parsePriceInput } from './money';
-import type { Category, CycleUnit, Subscription, SubscriptionDraft, SubscriptionStatus } from './types';
+import type { Category, CycleUnit, ItemKind, Subscription, SubscriptionDraft, SubscriptionStatus } from './types';
 
 export const CSV_HEADERS = [
   'name',
+  'type',
   'price',
+  'amount_varies',
+  'autopay',
+  'paid_through',
   'currency',
   'cycle_every',
   'cycle_unit',
@@ -86,7 +90,11 @@ export function subscriptionsToCSV(subs: readonly Subscription[], categories: re
     const category = categories.find((c) => c.id === s.categoryId);
     const cells = [
       s.name,
+      s.kind,
       s.price.toFixed(2),
+      s.amountVaries ? 'yes' : 'no',
+      s.kind === 'bill' ? (s.autopay ? 'yes' : 'no') : '',
+      s.paidThrough ?? '',
       s.currency,
       String(s.cycle.every),
       s.cycle.unit,
@@ -122,6 +130,22 @@ function normaliseHeader(h: string): string {
   return h.trim().toLowerCase().replace(/^﻿/, '').replace(/[\s-]+/g, '_');
 }
 
+/** Reads yes/no style cells; returns null for anything unrecognised. Empty means the default. */
+function booleanFromText(text: string, fallback: boolean): boolean | null {
+  const t = text.trim().toLowerCase();
+  if (!t) return fallback;
+  if (['yes', 'y', 'true', '1'].includes(t)) return true;
+  if (['no', 'n', 'false', '0'].includes(t)) return false;
+  return null;
+}
+
+function kindFromText(text: string): ItemKind | null {
+  const t = text.trim().toLowerCase();
+  if (!t || t === 'subscription' || t === 'subscriptions' || t === 'sub') return 'subscription';
+  if (t === 'bill' || t === 'bills') return 'bill';
+  return null;
+}
+
 function unitFromText(text: string): CycleUnit | null {
   const t = text.trim().toLowerCase();
   if (!t) return 'month';
@@ -134,7 +158,7 @@ function unitFromText(text: string): CycleUnit | null {
 }
 
 /**
- * Parses a CSV exported by Billnest (or a hand-made one with at least `name` and `price` columns).
+ * Parses a CSV exported by Bowerly (or a hand-made one with at least `name` and `price` columns).
  * Unknown categories are created. Rows with problems are skipped and reported, never imported half-formed.
  */
 export function parseSubscriptionsCSV(
@@ -215,6 +239,22 @@ export function parseSubscriptionsCSV(
       errors.push({ row: rowNumber, message: `Invalid currency code for "${name}".` });
       continue;
     }
+    const kind = kindFromText(cell(row, 'type'));
+    if (!kind) {
+      errors.push({ row: rowNumber, message: `Invalid type for "${name}" (use subscription or bill).` });
+      continue;
+    }
+    const autopay = booleanFromText(cell(row, 'autopay'), true);
+    const amountVaries = booleanFromText(cell(row, 'amount_varies'), false);
+    if (autopay === null || amountVaries === null) {
+      errors.push({ row: rowNumber, message: `Use yes or no for autopay and amount_varies on "${name}".` });
+      continue;
+    }
+    const paidThroughText = cell(row, 'paid_through');
+    if (paidThroughText && !isValidISODate(paidThroughText)) {
+      errors.push({ row: rowNumber, message: `Invalid paid-through date for "${name}" (use yyyy-mm-dd).` });
+      continue;
+    }
 
     const categoryName = cell(row, 'category');
     let category = categoryName
@@ -237,6 +277,10 @@ export function parseSubscriptionsCSV(
 
     drafts.push({
       name,
+      kind,
+      autopay: kind === 'bill' ? autopay : true,
+      amountVaries,
+      paidThrough: kind === 'bill' && !autopay ? paidThroughText || null : null,
       price,
       currency,
       cycle: { every, unit },

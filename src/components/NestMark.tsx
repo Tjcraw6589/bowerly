@@ -11,7 +11,7 @@ interface NestMarkProps {
 }
 
 /**
- * The Billnest mark (a bill resting in a nest) drawn with plain Views so it
+ * The Bowerly mark (a bill resting in a nest) drawn with plain Views so it
  * renders identically on iOS, Android and web without an SVG dependency.
  * Mirrors the vector used for the app icon in scripts/generate-assets.mjs.
  */
@@ -21,7 +21,7 @@ export function NestMark({ size = 72, color, billColor }: NestMarkProps) {
   const bill = billColor ?? colors.surface;
   const s = size / 100;
   return (
-    <View style={{ width: size, height: size }} accessible accessibilityLabel="Billnest">
+    <View style={{ width: size, height: size }} accessible accessibilityLabel="Bowerly">
       <View
         style={[
           styles.bill,

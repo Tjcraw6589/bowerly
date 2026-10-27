@@ -16,11 +16,11 @@ export const MAX_NOTES_LENGTH = 500;
 export function validateDraft(d: SubscriptionDraft): DraftErrors {
   const errors: DraftErrors = {};
   const name = d.name.trim();
-  if (!name) errors.name = 'Give this subscription a name.';
+  if (!name) errors.name = `Give this ${d.kind === 'bill' ? 'bill' : 'subscription'} a name.`;
   else if (name.length > MAX_NAME_LENGTH) errors.name = `Keep the name under ${MAX_NAME_LENGTH} characters.`;
 
-  if (!Number.isFinite(d.price) || d.price < 0) errors.price = 'Enter a valid price.';
-  else if (d.price > 1_000_000) errors.price = 'That price looks too large.';
+  if (!Number.isFinite(d.price) || d.price < 0) errors.price = 'Enter a valid amount.';
+  else if (d.price > 1_000_000) errors.price = 'That amount looks too large.';
 
   if (!Number.isInteger(d.cycle.every) || d.cycle.every < 1 || d.cycle.every > 365) {
     errors.cycleEvery = 'Repeat every 1 to 365 units.';

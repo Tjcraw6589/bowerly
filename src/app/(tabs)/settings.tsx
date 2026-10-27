@@ -81,7 +81,7 @@ export default function SettingsScreen() {
       updateSettings({ notificationsEnabled: true });
       setFeedback({ tone: 'success', message: 'Reminders are on. You can change the time below.' });
     } else {
-      setFeedback({ tone: 'warning', message: 'Notifications are turned off for Billnest in your system settings.' });
+      setFeedback({ tone: 'warning', message: 'Notifications are turned off for Bowerly in your system settings.' });
       if (Platform.OS !== 'web') Linking.openSettings().catch(() => undefined);
     }
   };
@@ -136,7 +136,7 @@ export default function SettingsScreen() {
     resetAll();
     await cancelAllReminders();
     setSheet(null);
-    setFeedback({ tone: 'success', message: 'All subscriptions were deleted from this device.' });
+    setFeedback({ tone: 'success', message: 'All bills and subscriptions were deleted from this device.' });
   };
 
   return (
@@ -151,7 +151,7 @@ export default function SettingsScreen() {
         </View>
       ) : null}
 
-      <SectionHeader title="Billnest Pro" first={!feedback} />
+      <SectionHeader title="Bowerly Pro" first={!feedback} />
       <Card testID="pro-card">
         {isPro ? (
           <View style={styles.proRow}>
@@ -159,7 +159,7 @@ export default function SettingsScreen() {
             <View style={styles.flex}>
               <AppText variant="bodyBold">Pro is unlocked</AppText>
               <AppText variant="caption" tone="muted">
-                No ads, unlimited subscriptions, CSV export and import, custom categories and full insights. Thank you for supporting an
+                No ads, unlimited bills and subscriptions, CSV export and import, custom categories and full insights. Thank you for supporting an
                 independent app.
               </AppText>
             </View>
@@ -168,7 +168,7 @@ export default function SettingsScreen() {
           <>
             <AppText variant="bodyBold">Go Pro, once</AppText>
             <AppText variant="caption" tone="muted" style={{ marginTop: 2 }}>
-              One payment, yours forever. Removes ads and unlocks unlimited subscriptions, CSV export and import, custom categories and
+              One payment, yours forever. Removes ads and unlocks unlimited bills and subscriptions, CSV export and import, custom categories and
               category and timeline insights.
             </AppText>
             <View style={[styles.buttons, { marginTop: spacing.md }]}>
@@ -199,8 +199,8 @@ export default function SettingsScreen() {
           <SegmentedControl options={THEMES} value={settings.theme} onChange={(theme) => updateSettings({ theme })} testID="theme" />
         </View>
         <Row
-          title="Renewal reminders"
-          subtitle={notificationsSupported ? 'Local notifications before renewals and trial ends' : 'Available in the iPhone and Android apps'}
+          title="Bill reminders"
+          subtitle={notificationsSupported ? 'Local notifications before due dates and trial ends' : 'Available in the mobile app'}
           toggle={{ value: settings.notificationsEnabled, onValueChange: (v) => void toggleNotifications(v), disabled: !notificationsSupported }}
           testID="settings-notifications"
         />
@@ -217,7 +217,7 @@ export default function SettingsScreen() {
       <Card padded={false}>
         <Row
           title="Export to CSV"
-          subtitle={isPro ? 'Share a spreadsheet of every subscription' : 'Pro feature'}
+          subtitle={isPro ? 'Share a spreadsheet of every bill' : 'Pro feature'}
           right={busy === 'export' ? undefined : undefined}
           onPress={exportCSV}
           testID="settings-export"
@@ -234,13 +234,13 @@ export default function SettingsScreen() {
 
       <SectionHeader title="About" />
       <Card padded={false}>
-        {rateUrl ? <Row title="Rate Billnest" subtitle="A review helps more than you'd think" onPress={() => void Linking.openURL(rateUrl)} /> : null}
+        {rateUrl ? <Row title="Rate Bowerly" subtitle="A review helps more than you'd think" onPress={() => void Linking.openURL(rateUrl)} /> : null}
         <Row title="Privacy policy" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'privacy' } })} testID="settings-privacy" />
         <Row title="Terms of use" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'terms' } })} testID="settings-terms" />
         <Row
           title="Contact support"
           subtitle={SUPPORT_EMAIL}
-          onPress={() => void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=Billnest%20${APP_VERSION}`)}
+          onPress={() => void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=Bowerly%20${APP_VERSION}`)}
         />
         <Row title="Version" value={APP_VERSION} chevron={false} last />
       </Card>
@@ -270,7 +270,7 @@ export default function SettingsScreen() {
       <ConfirmSheet
         visible={sheet === 'reset'}
         title="Delete all data?"
-        message={`This removes all ${subs.length} subscriptions and any custom categories from this device. Your settings and Pro status stay. This cannot be undone.`}
+        message={`This removes all ${subs.length} bills and subscriptions and any custom categories from this device. Your settings and Pro status stay. This cannot be undone.`}
         confirmLabel="Delete everything"
         destructive
         onConfirm={() => void resetEverything()}
@@ -284,7 +284,7 @@ export default function SettingsScreen() {
               <>
                 <Notice
                   tone="success"
-                  message={`${importSummary.imported} subscription${importSummary.imported === 1 ? '' : 's'} imported${
+                  message={`${importSummary.imported} ${importSummary.imported === 1 ? 'item' : 'items'} imported${
                     importSummary.skippedForLimit > 0 ? `, ${importSummary.skippedForLimit} skipped because of the free limit` : ''
                   }.`}
                 />
@@ -293,7 +293,7 @@ export default function SettingsScreen() {
             ) : (
               <>
                 <AppText variant="body">
-                  {importResult.drafts.length} subscription{importResult.drafts.length === 1 ? '' : 's'} ready to import
+                  {importResult.drafts.length} {importResult.drafts.length === 1 ? 'item' : 'items'} ready to import
                   {importResult.newCategories.length > 0 ? `, creating ${importResult.newCategories.length} new categor${importResult.newCategories.length === 1 ? 'y' : 'ies'}` : ''}
                   .
                 </AppText>

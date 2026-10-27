@@ -6,7 +6,7 @@ import { expect, type Page, test } from '@playwright/test';
  * rely on (contact email, Pro price wording, legal page dates).
  */
 
-const OLD_NAME = /sub\s*tally/i;
+const OLD_NAME = /sub\s*tally|bill\s*nest/i;
 
 const categories = [
   ['cat_streaming', 'Streaming', '🎬', '#E53958'],
@@ -47,6 +47,9 @@ function seededState(isPro: boolean): string {
         sub('a', 'Netflix', 15.49),
         sub('b', 'Gym', 39, { categoryId: 'cat_fitness', status: 'paused' }),
         sub('c', 'Old app', 4.99, { status: 'cancelled', cancelledAt: '2026-05-01T00:00:00.000Z' }),
+        // Saved as version 1 data, so this also exercises the upgrade; kind/autopay are kept.
+        sub('d', 'Rent', 1200, { kind: 'bill', autopay: false, firstBillDate: '2026-01-01', categoryId: 'cat_housing', emoji: '🏠', createdAt: '2026-09-20T00:00:00.000Z' }),
+        sub('e', 'Electricity', 85, { kind: 'bill', autopay: true, amountVaries: true, categoryId: 'cat_utilities', emoji: '💡' }),
       ],
       categories: [...categories, { id: 'custom1', name: 'Pets', emoji: '🐾', color: '#0EA5E9', builtIn: false }],
       settings: { currency: 'USD', theme: 'light', reminderHour: 9, notificationsEnabled: false, onboardingComplete: true, summaryPeriod: 'month', sortBy: 'nextBill' },
@@ -67,7 +70,7 @@ async function expectNoOldName(page: Page, where: string): Promise<void> {
   expect(text.length, `${where} rendered no text`).toBeGreaterThan(20);
 }
 
-test.describe('Billnest brand and facts', () => {
+test.describe('Bowerly brand and facts', () => {
   test('fresh user: onboarding and empty screens', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByTestId('onboarding')).toBeVisible();
@@ -88,7 +91,7 @@ test.describe('Billnest brand and facts', () => {
       await expect(page.getByTestId(id)).toBeVisible();
       await expectNoOldName(page, `fresh ${path}`);
     }
-    expect(await page.title()).toBe('Billnest');
+    expect(await page.title()).toBe('Bowerly');
   });
 
   test('Pro user with data: every screen', async ({ page }) => {
@@ -103,6 +106,8 @@ test.describe('Billnest brand and facts', () => {
       ['/subscription/a', 'detail-screen'],
       ['/subscription/b', 'detail-screen'],
       ['/subscription/c', 'detail-screen'],
+      ['/subscription/d', 'detail-screen'],
+      ['/subscription/e', 'detail-screen'],
       ['/categories', 'categories-screen'],
       ['/pro?reason=general', 'pro-screen'],
       ['/legal/privacy', 'legal-screen'],
@@ -113,6 +118,13 @@ test.describe('Billnest brand and facts', () => {
       await expect(page.getByTestId(id)).toBeVisible();
       await expectNoOldName(page, path);
     }
+    // The v1 data was upgraded: the rent is a hand-paid bill and shows as overdue.
+    await page.goto('/');
+    await expect(page.getByTestId('totals-split')).toBeVisible();
+    await expect(page.getByTestId('totals-overdue')).toBeVisible();
+    await expect(page.getByTestId('kind-filter')).toBeVisible();
+    await page.goto('/upcoming');
+    await expect(page.getByTestId('overdue-section')).toBeVisible();
     await page.goto('/settings');
     await expect(page.getByText('Pro is unlocked')).toBeVisible();
     await expect(page.getByText('tyjcraw@gmail.com')).toBeVisible();

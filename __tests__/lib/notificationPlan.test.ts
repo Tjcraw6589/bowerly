@@ -72,3 +72,22 @@ describe('buildNotificationPlan', () => {
     for (let i = 1; i < plan.length; i++) expect(plan[i]!.fireAt.getTime()).toBeGreaterThanOrEqual(plan[i - 1]!.fireAt.getTime());
   });
 });
+
+describe('bill reminders', () => {
+  test('hand-paid bills say "is due" and get an overdue nudge the morning after', () => {
+    const bill = makeSub({ name: 'Rent', kind: 'bill', autopay: false, price: 1200, firstBillDate: '2026-01-25', createdAt: '2026-10-01T00:00:00.000Z' });
+    const plan = buildNotificationPlan([bill], settings, now);
+    expect(plan[0]).toMatchObject({ title: 'Rent is due tomorrow', body: '$1,200.00 is due on Oct 25.', key: `${bill.id}|bill|2026-10-25` });
+    expect(plan[1]).toMatchObject({ title: 'Rent is overdue', key: `${bill.id}|late|2026-10-25` });
+    expect(plan[1]!.fireAt).toEqual(new Date(2026, 9, 26, 9, 0, 0, 0));
+  });
+
+  test('paid dates are skipped; autopaid and varying bills are worded to match', () => {
+    const paid = makeSub({ name: 'Rent', kind: 'bill', autopay: false, firstBillDate: '2026-01-25', paidThrough: '2026-10-25' });
+    expect(buildNotificationPlan([paid], settings, now).some((p) => p.key.endsWith('2026-10-25'))).toBe(false);
+    const power = makeSub({ name: 'Power', kind: 'bill', autopay: true, amountVaries: true, price: 80, firstBillDate: '2026-01-25' });
+    const plan = buildNotificationPlan([power], settings, now);
+    expect(plan[0]).toMatchObject({ title: 'Power is due tomorrow', body: 'About $80.00 will be paid automatically on Oct 25.' });
+    expect(plan.some((p) => p.key.includes('|late|'))).toBe(false);
+  });
+});

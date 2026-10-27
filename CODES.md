@@ -7,9 +7,9 @@ Fill in each line as you get it, then paste this whole file to me (or run `npm r
 | Apple ID email | the email you used to enroll | you@example.com | |
 | App Store Connect App ID | App Store Connect → your app → App Information → "Apple ID" | 6751234567 | 6827302207 |
 | Apple Team ID | developer.apple.com/account → Membership details | AB12CD34EF | JA88SJ7PGW |
-| AdMob Android App ID | apps.admob.com → Apps → Billnest (Android) → App settings | ca-app-pub-1234567890123456~1234567890 | |
+| AdMob Android App ID | apps.admob.com → Apps → Bowerly (Android) → App settings | ca-app-pub-1234567890123456~1234567890 | |
 | AdMob Android banner ad unit ID | same app → Ad units → the Banner unit | ca-app-pub-1234567890123456/1234567890 | |
-| AdMob iOS App ID | apps.admob.com → Apps → Billnest (iOS) → App settings | ca-app-pub-1234567890123456~0987654321 | |
+| AdMob iOS App ID | apps.admob.com → Apps → Bowerly (iOS) → App settings | ca-app-pub-1234567890123456~0987654321 | |
 | AdMob iOS banner ad unit ID | same app → Ad units → the Banner unit | ca-app-pub-1234567890123456/0987654321 | |
 | RevenueCat Apple public key | app.revenuecat.com → Project settings → API keys → App specific keys | appl_xxxxxxxxxxxxxxxx | appl_gYgfPCOGaRTCkjjeZXXOquYKlTK |
 | RevenueCat Google public key | same page | goog_xxxxxxxxxxxxxxxx | |

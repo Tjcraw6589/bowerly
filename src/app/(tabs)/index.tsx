@@ -20,12 +20,18 @@ import { useToday } from '@/hooks/useToday';
 import { findCategory } from '@/lib/categories';
 import { canAddActiveSubscription, FREE_ACTIVE_LIMIT } from '@/lib/limits';
 import { filterSubscriptions, SORT_OPTIONS, sortSubscriptions } from '@/lib/sort';
-import { counts, totalsByCurrency } from '@/lib/stats';
-import type { Subscription } from '@/lib/types';
+import { counts, totalsByCurrency, totalsByKind } from '@/lib/stats';
+import type { KindFilter, Subscription } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
-export default function SubscriptionsScreen() {
+const KIND_FILTERS: readonly { key: KindFilter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'bill', label: '🧾 Bills' },
+  { key: 'subscription', label: '🔁 Subscriptions' },
+];
+
+export default function BillsScreen() {
   const router = useRouter();
   const today = useToday();
   const { languageTag } = useLocale();
@@ -38,6 +44,7 @@ export default function SubscriptionsScreen() {
 
   const [query, setQuery] = useState('');
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [kind, setKind] = useState<KindFilter>('all');
   const [sortOpen, setSortOpen] = useState(false);
 
   const tally = useMemo(() => counts(subs, today), [subs, today]);
@@ -45,11 +52,15 @@ export default function SubscriptionsScreen() {
     () => totalsByCurrency(subs, settings.summaryPeriod, settings.currency, today),
     [subs, settings.summaryPeriod, settings.currency, today],
   );
+  const split = useMemo(
+    () => totalsByKind(subs, settings.summaryPeriod, totals[0]?.currency ?? settings.currency, today),
+    [subs, settings.summaryPeriod, settings.currency, totals, today],
+  );
   const sections = useMemo(() => {
-    const visible = sortSubscriptions(filterSubscriptions(subs, query, categoryId), settings.sortBy, today);
+    const visible = sortSubscriptions(filterSubscriptions(subs, query, categoryId, kind), settings.sortBy, today);
     const group = (status: Subscription['status'], title: string) => ({ title, data: visible.filter((s) => s.status === status) });
     return [group('active', 'Active'), group('paused', 'Paused'), group('cancelled', 'Cancelled')].filter((g) => g.data.length > 0);
-  }, [subs, query, categoryId, settings.sortBy, today]);
+  }, [subs, query, categoryId, kind, settings.sortBy, today]);
   const usedCategories = useMemo(
     () => categories.filter((c) => subs.some((s) => s.categoryId === c.id)),
     [categories, subs],
@@ -66,14 +77,14 @@ export default function SubscriptionsScreen() {
     return (
       <Screen testID="subscriptions-screen" footer={<AdBanner />}>
         <AppText variant="title" style={{ marginTop: spacing.md }}>
-          Subscriptions
+          Bills
         </AppText>
         <View style={styles.flex}>
           <EmptyState
             emoji="🪺"
-            title="No subscriptions yet"
-            body="Add the services you pay for. Billnest keeps every bill in one nest and reminds you before each renewal."
-            actionLabel="Add your first subscription"
+            title="Nothing tracked yet"
+            body="Add rent, utilities, insurance, loans, your phone plan and every subscription. Bowerly reminds you before each one is due."
+            actionLabel="Add your first bill"
             onAction={onAdd}
             testID="empty-state"
           />
@@ -93,7 +104,7 @@ export default function SubscriptionsScreen() {
         ListHeaderComponent={
           <View>
             <View style={[styles.titleRow, { marginTop: spacing.md, marginBottom: spacing.md }]}>
-              <AppText variant="title">Subscriptions</AppText>
+              <AppText variant="title">Bills</AppText>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Sort"
@@ -110,14 +121,15 @@ export default function SubscriptionsScreen() {
               period={settings.summaryPeriod}
               onPeriodChange={(summaryPeriod) => updateSettings({ summaryPeriod })}
               locale={languageTag}
-              activeCount={tally.active}
+              split={split}
               trialCount={tally.trials}
+              overdueCount={tally.overdue}
             />
             {nearLimit ? (
               <View style={{ marginTop: spacing.md }}>
                 <Notice
                   tone="pro"
-                  message={`${tally.active} of ${FREE_ACTIVE_LIMIT} free active subscriptions used. Pro removes the limit and the ads.`}
+                  message={`${tally.active} of ${FREE_ACTIVE_LIMIT} free active items used. Pro removes the limit and the ads.`}
                   actionLabel="See Pro"
                   onAction={() => router.push({ pathname: '/pro', params: { reason: 'limit' } })}
                   testID="limit-notice"
@@ -127,7 +139,7 @@ export default function SubscriptionsScreen() {
             {subs.length > 4 ? (
               <View style={{ marginTop: spacing.lg }}>
                 <TextField
-                  placeholder="Search subscriptions"
+                  placeholder="Search bills and subscriptions"
                   value={query}
                   onChangeText={setQuery}
                   autoCorrect={false}
@@ -146,6 +158,13 @@ export default function SubscriptionsScreen() {
             ) : (
               <View style={{ height: spacing.lg }} />
             )}
+            {tally.bills > 0 && tally.subscriptions > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.xs }} testID="kind-filter">
+                {KIND_FILTERS.map((k) => (
+                  <Chip key={k.key} label={k.label} selected={kind === k.key} onPress={() => setKind(k.key)} />
+                ))}
+              </ScrollView>
+            ) : null}
             {usedCategories.length > 1 ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.xs }}>
                 <Chip label="All" selected={categoryId === null} onPress={() => setCategoryId(null)} />
@@ -181,7 +200,7 @@ export default function SubscriptionsScreen() {
         )}
         ListEmptyComponent={
           <View style={{ marginTop: spacing.xl }}>
-            <EmptyState emoji="🔍" title="Nothing matches" body="Try a different search or clear the category filter." />
+            <EmptyState emoji="🔍" title="Nothing matches" body="Try a different search or clear the filters." />
           </View>
         }
       />

@@ -1,8 +1,8 @@
-# Billnest — handoff: the steps only you can do
+# Bowerly — handoff: the steps only you can do
 
 Everything in the code is finished and verified (see `PLAN.md` for what was verified and how). The remaining steps all need your identity, your money or your logins, so they cannot be automated. Work through them in order; most are one-time account setups. Total: roughly half a day, mostly waiting on account approvals.
 
-All commands run from this folder (`C:\Users\Tyjcr\Documents\Billnest`) in a terminal.
+All commands run from this folder (`C:\Users\Tyjcr\Documents\SubTally`) in a terminal.
 
 ---
 
@@ -22,8 +22,8 @@ All commands run from this folder (`C:\Users\Tyjcr\Documents\Billnest`) in a ter
 
 1. Enroll at https://developer.apple.com/programs/enroll/ with your Apple ID (as an individual).
 2. When approved, open https://appstoreconnect.apple.com/ → **Apps** → **+** → **New App**:
-   - Platforms: iOS. Name: `Billnest`. Primary language: English (U.S.).
-   - Bundle ID: register `com.tyjcraw.subtally` when prompted (type "Explicit", description "Billnest"). The code already uses this identifier.
+   - Platforms: iOS. Name: `Bowerly`. Primary language: English (U.S.).
+   - Bundle ID: register `com.tyjcraw.subtally` when prompted (type "Explicit", description "Bowerly"). The code already uses this identifier.
    - SKU: `subtally`. User access: Full access.
 3. Note two values for step 8:
    - **Apple ID of the app** (numeric): App Store Connect → your app → **App Information** → "Apple ID".
@@ -33,10 +33,10 @@ All commands run from this folder (`C:\Users\Tyjcr\Documents\Billnest`) in a ter
 ## 3. Create the Google Play Console account (USD 25 one-time; identity verification can take days)
 
 1. Register at https://play.google.com/console/signup as a personal developer account and complete identity verification.
-2. Create the app: **Create app** → name `Billnest`, App, Free, accept declarations.
+2. Create the app: **Create app** → name `Bowerly`, App, Free, accept declarations.
 3. Create a **service account** so EAS can upload builds for you. Follow Expo's guide exactly: https://github.com/expo/fyi/blob/main/creating-google-service-account.md. Save the downloaded JSON as:
    ```
-   C:\Users\Tyjcr\Documents\Billnest\credentials\google-play-service-account.json
+   C:\Users\Tyjcr\Documents\SubTally\credentials\google-play-service-account.json
    ```
    (the `credentials/` folder is git-ignored; never commit this file).
 
@@ -61,10 +61,10 @@ Both stores require a public privacy policy URL. The pages are already generated
 ## 5. Set up AdMob (30 min; ad serving starts after Google approves the app, usually within a day)
 
 1. Sign in at https://apps.admob.com/ and create an AdMob account (needs an AdSense payments profile; follow the prompts).
-2. **Apps** → **Add app** → platform **Android** → "No, the app isn't listed on a supported app store" (you can link it after launch) → name `Billnest`. Copy the **App ID** (looks like `ca-app-pub-1234567890123456~1234567890`).
-3. In that app → **Ad units** → **Add ad unit** → **Banner** → name `Billnest Android Banner`. Copy the **Ad unit ID** (looks like `ca-app-pub-1234567890123456/1234567890`).
+2. **Apps** → **Add app** → platform **Android** → "No, the app isn't listed on a supported app store" (you can link it after launch) → name `Bowerly`. Copy the **App ID** (looks like `ca-app-pub-1234567890123456~1234567890`).
+3. In that app → **Ad units** → **Add ad unit** → **Banner** → name `Bowerly Android Banner`. Copy the **Ad unit ID** (looks like `ca-app-pub-1234567890123456/1234567890`).
 4. Repeat 2 and 3 for platform **iOS** (App ID and a Banner ad unit).
-5. Consent for EU/UK users and the iOS tracking prompt are handled by AdMob's built-in messages. Turn them on once: **Privacy & messaging** → **GDPR** → Create message (select the Billnest apps, default settings) → Publish. Then **IDFA** (iOS) → Create message → Publish. Docs: https://support.google.com/admob/answer/10113207 and https://support.google.com/admob/answer/10115027. The app already calls the consent flow at startup, after onboarding.
+5. Consent for EU/UK users and the iOS tracking prompt are handled by AdMob's built-in messages. Turn them on once: **Privacy & messaging** → **GDPR** → Create message (select the Bowerly apps, default settings) → Publish. Then **IDFA** (iOS) → Create message → Publish. Docs: https://support.google.com/admob/answer/10113207 and https://support.google.com/admob/answer/10115027. The app already calls the consent flow at startup, after onboarding.
 6. Keep the four IDs for step 8.
 
 ## 6. Set up RevenueCat and the Pro product (45 min)
@@ -77,9 +77,9 @@ The app expects exactly these identifiers:
 | Product identifier (both stores) | `subtally_pro_lifetime` |
 | Offering | the **current** offering, containing a **Lifetime** package with the product above |
 
-1. **App Store Connect**: your app → **Monetization** → **In-App Purchases** → **+** → type **Non-Consumable**, reference name `Billnest Pro`, product ID `subtally_pro_lifetime`. Price: USD 4.99 (already set). Add the English display name "Billnest Pro" and description "Remove ads, unlimited subscriptions, export". Upload any screenshot of the Pro screen for review and add the review note from `STORE_LISTING.md`. Docs: https://developer.apple.com/help/app-store-connect/manage-in-app-purchases/create-in-app-purchases
-2. **Google Play Console**: your app → **Monetize** → **Products** → **In-app products** → **Create product** → product ID `subtally_pro_lifetime`, name `Billnest Pro`, description "Remove ads, unlimited subscriptions, export", set a price → Save → **Activate**. (Play requires one build to be uploaded first, see step 9; come back and create the product after that if the page refuses.)
-3. **RevenueCat**: sign up at https://app.revenuecat.com/signup → create project `Billnest`.
+1. **App Store Connect**: your app → **Monetization** → **In-App Purchases** → **+** → type **Non-Consumable**, reference name `Bowerly Pro`, product ID `subtally_pro_lifetime`. Price: USD 4.99 (already set). Add the English display name "Bowerly Pro" and description "Remove ads, unlimited bills, export". Upload any screenshot of the Pro screen for review and add the review note from `STORE_LISTING.md`. Docs: https://developer.apple.com/help/app-store-connect/manage-in-app-purchases/create-in-app-purchases
+2. **Google Play Console**: your app → **Monetize** → **Products** → **In-app products** → **Create product** → product ID `subtally_pro_lifetime`, name `Bowerly Pro`, description "Remove ads, unlimited bills, export", set a price → Save → **Activate**. (Play requires one build to be uploaded first, see step 9; come back and create the product after that if the page refuses.)
+3. **RevenueCat**: sign up at https://app.revenuecat.com/signup → create project `Bowerly`.
    - **Apps & providers** → add **App Store** app: bundle ID `com.tyjcraw.subtally`, then follow the on-screen link to add an App Store Connect **In-App Purchase Key** (docs: https://www.revenuecat.com/docs/service-credentials/itunesconnect-app-specific-shared-secret/in-app-purchase-key-configuration).
    - Add **Play Store** app: package `com.tyjcraw.subtally`, upload a Play service credentials JSON (docs: https://www.revenuecat.com/docs/service-credentials/creating-play-service-credentials). You may reuse the service account from step 3 if you grant it the permissions that guide lists.
    - **Product catalog** → **Products** → import or add `subtally_pro_lifetime` for both apps.
@@ -93,7 +93,7 @@ Build a development client once and test purchases with a sandbox account:
 ```bash
 npx eas-cli@latest build --platform android --profile development
 ```
-Install the APK on an Android phone (the build page gives a QR code), run `npx expo start`, open the app, add 10 subscriptions to see the free limit, tap **See Pro** and buy with a Play **license tester** account (Play Console → Setup → License testing). On iOS the same works with an `ios-simulator`/`development` build and a Sandbox Apple ID (App Store Connect → Users and Access → Sandbox).
+Install the APK on an Android phone (the build page gives a QR code), run `npx expo start`, open the app, add 10 bills or subscriptions to see the free limit, tap **See Pro** and buy with a Play **license tester** account (Play Console → Setup → License testing). On iOS the same works with an `ios-simulator`/`development` build and a Sandbox Apple ID (App Store Connect → Users and Access → Sandbox).
 
 ## 8. Put your identifiers into the project (5 min)
 
@@ -142,7 +142,7 @@ First-run prompts: let EAS **generate the Android keystore** and **manage iOS cr
 
 - AdMob: link the published store listings to the AdMob apps (**Apps** → app → **App settings** → "Add store listing") so ads start serving at full fill.
 - Play Console: set the Pro in-app product to **Active** if you deferred it in step 6.
-- Reply to early reviews; the in-app rating prompt only appears after a user's fourth session with three or more subscriptions, so expect ratings to trickle in during week two.
+- Reply to early reviews; the in-app rating prompt only appears after a user's fourth session with three or more active items, so expect ratings to trickle in during week two.
 
 ## Everyday commands
 

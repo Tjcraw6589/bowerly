@@ -9,7 +9,7 @@ let lastSignature = '';
 function signature(): string {
   const { subscriptions, settings } = useStore.getState();
   const subs = subscriptions
-    .map((s) => `${s.id}:${s.status}:${s.reminderDaysBefore}:${s.firstBillDate}:${s.cycle.every}${s.cycle.unit}:${s.trialEndDate}:${s.name}:${s.price}`)
+    .map((s) => `${s.id}:${s.status}:${s.reminderDaysBefore}:${s.firstBillDate}:${s.cycle.every}${s.cycle.unit}:${s.trialEndDate}:${s.name}:${s.price}:${s.kind}:${s.autopay}:${s.amountVaries}:${s.paidThrough}:${s.createdAt}`)
     .join('|');
   return `${settings.notificationsEnabled}:${settings.reminderHour}:${subs}`;
 }

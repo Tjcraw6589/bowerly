@@ -11,7 +11,7 @@ interface FABProps {
   testID?: string;
 }
 
-export function FAB({ onPress, bottomOffset = 0, accessibilityLabel = 'Add subscription', testID }: FABProps) {
+export function FAB({ onPress, bottomOffset = 0, accessibilityLabel = 'Add bill or subscription', testID }: FABProps) {
   const { colors, spacing } = useTheme();
   return (
     <Pressable

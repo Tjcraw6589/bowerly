@@ -24,12 +24,17 @@ import { CURRENCIES, currencyInfo } from '@/lib/currencies';
 import { addDays, formatDate, nextBillDate, parseISODate, toISODate } from '@/lib/dates';
 import { CYCLE_PRESETS, cycleLabel, cyclesEqual, formatMoney, parsePriceInput } from '@/lib/money';
 import { AVATAR_EMOJIS, searchPresets, type ServicePreset } from '@/lib/presets';
-import type { BillingCycle, CycleUnit, Settings, Subscription, SubscriptionDraft } from '@/lib/types';
+import type { BillingCycle, CycleUnit, ItemKind, Settings, Subscription, SubscriptionDraft } from '@/lib/types';
 import { type DraftErrors, hasErrors, MAX_NAME_LENGTH, MAX_NOTES_LENGTH, validateDraft } from '@/lib/validation';
 import { successHaptic, warningHaptic } from '@/services/haptics';
 import { maybeRequestReview } from '@/services/review';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
+
+const KIND_OPTIONS = [
+  { key: 'bill', label: '🧾 Bill' },
+  { key: 'subscription', label: '🔁 Subscription' },
+] as const;
 
 const CYCLE_KEYS = [
   { key: 'week', label: 'Weekly' },
@@ -67,9 +72,13 @@ function cycleForKey(key: Exclude<CycleKey, 'custom'>): BillingCycle {
   return { week: CYCLE_PRESETS[0]!.cycle, month: CYCLE_PRESETS[1]!.cycle, quarter: CYCLE_PRESETS[2]!.cycle, year: CYCLE_PRESETS[3]!.cycle }[key];
 }
 
-function defaultDraft(settings: Settings, today: Date): SubscriptionDraft {
+function defaultDraft(settings: Settings, today: Date, kind: ItemKind): SubscriptionDraft {
   return {
     name: '',
+    kind,
+    autopay: kind === 'subscription',
+    amountVaries: false,
+    paidThrough: null,
     price: 0,
     currency: settings.currency,
     cycle: { every: 1, unit: 'month' },
@@ -91,7 +100,7 @@ function toDraft(s: Subscription): SubscriptionDraft {
 }
 
 export default function EditorScreen() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, kind: kindParam } = useLocalSearchParams<{ id?: string; kind?: string }>();
   const router = useRouter();
   const today = useToday();
   const { languageTag, decimalSeparator } = useLocale();
@@ -102,7 +111,7 @@ export default function EditorScreen() {
   const addSubscription = useStore((s) => s.addSubscription);
   const updateSubscription = useStore((s) => s.updateSubscription);
 
-  const [draft, setDraft] = useState<SubscriptionDraft>(() => (existing ? toDraft(existing) : defaultDraft(settings, today)));
+  const [draft, setDraft] = useState<SubscriptionDraft>(() => (existing ? toDraft(existing) : defaultDraft(settings, today, kindParam === 'subscription' ? 'subscription' : 'bill')));
   const [priceText, setPriceText] = useState(() => (existing ? existing.price.toFixed(2) : ''));
   const [cycleKey, setCycleKey] = useState<CycleKey>(() => (existing ? cycleKeyFor(existing.cycle) : 'month'));
   const [everyText, setEveryText] = useState(() => String(draft.cycle.every));
@@ -119,7 +128,18 @@ export default function EditorScreen() {
   );
 
   const applyPreset = (p: ServicePreset) => {
-    setDraft((d) => ({ ...d, name: p.name, emoji: p.emoji, color: p.color, categoryId: p.categoryId, cycle: p.cycle }));
+    setDraft((d) => ({
+      ...d,
+      name: p.name,
+      emoji: p.emoji,
+      color: p.color,
+      categoryId: p.categoryId,
+      cycle: p.cycle,
+      kind: p.kind,
+      autopay: p.kind === 'subscription' ? true : (p.autopay ?? false),
+      amountVaries: p.amountVaries ?? false,
+      trialEndDate: p.kind === 'bill' ? null : d.trialEndDate,
+    }));
     setCycleKey(cycleKeyFor(p.cycle));
     setEveryText(String(p.cycle.every));
     setPresetDismissed(true);
@@ -135,6 +155,19 @@ export default function EditorScreen() {
   const nextRenewal = nextBillDate(firstDate, currentCycle, today);
   const category = findCategory(categories, draft.categoryId);
   const priceValue = parsePriceInput(priceText, decimalSeparator);
+
+  const isBill = draft.kind === 'bill';
+  const noun = isBill ? 'bill' : 'subscription';
+
+  const setKind = (kind: ItemKind) => {
+    setDraft((d) => ({
+      ...d,
+      kind,
+      autopay: kind === 'subscription' ? true : d.kind === 'bill' ? d.autopay : false,
+      trialEndDate: kind === 'bill' ? null : d.trialEndDate,
+    }));
+    if (errors.firstBillDate) setErrors((e) => ({ ...e, firstBillDate: undefined }));
+  };
 
   const setTrial = (on: boolean) => {
     if (!on) {
@@ -163,6 +196,10 @@ export default function EditorScreen() {
       price: priceValue ?? Number.NaN,
       cycle: currentCycle,
       notes: draft.notes.slice(0, MAX_NOTES_LENGTH),
+      // Only bills paid by hand keep a paid-through date; only subscriptions have trials.
+      autopay: isBill ? draft.autopay : true,
+      paidThrough: isBill && !draft.autopay ? draft.paidThrough : null,
+      trialEndDate: isBill ? null : draft.trialEndDate,
     };
     const errs = validateDraft(candidate);
     if (cycleKey === 'custom' && (!Number.isInteger(Number(everyText)) || Number(everyText) < 1)) errs.cycleEvery = 'Repeat every 1 to 365 units.';
@@ -204,11 +241,15 @@ export default function EditorScreen() {
       testID="editor-screen"
       footer={
         <View style={[styles.footer, { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, backgroundColor: colors.background }]}>
-          <Button label={existing ? 'Save changes' : 'Add subscription'} size="lg" fullWidth onPress={save} loading={saving} testID="editor-save" />
+          <Button label={existing ? 'Save changes' : `Add ${noun}`} size="lg" fullWidth onPress={save} loading={saving} testID="editor-save" />
         </View>
       }
     >
-      <Header title={existing ? 'Edit subscription' : 'New subscription'} dismiss="close" />
+      <Header title={existing ? `Edit ${noun}` : `New ${noun}`} dismiss="close" />
+
+      <View style={{ marginBottom: spacing.lg }}>
+        <SegmentedControl options={KIND_OPTIONS} value={draft.kind} onChange={setKind} testID="kind" />
+      </View>
 
       <View style={[styles.avatarRow, { marginBottom: spacing.lg }]}>
         <Pressable accessibilityRole="button" accessibilityLabel="Change icon and colour" onPress={() => setSheet('avatar')} testID="avatar-button">
@@ -220,7 +261,7 @@ export default function EditorScreen() {
         <View style={[styles.flex, { marginLeft: spacing.lg }]}>
           <TextField
             label="Name"
-            placeholder="Netflix, gym, rent…"
+            placeholder={isBill ? 'Rent, electricity, car insurance…' : 'Netflix, Spotify, gym…'}
             value={draft.name}
             onChangeText={(name) => {
               patch({ name });
@@ -245,7 +286,7 @@ export default function EditorScreen() {
       ) : null}
 
       <TextField
-        label="Price"
+        label={draft.amountVaries ? 'Typical amount' : 'Amount'}
         placeholder="0.00"
         value={priceText}
         onChangeText={(t) => {
@@ -272,7 +313,7 @@ export default function EditorScreen() {
       />
 
       <AppText variant="small" tone="muted" style={{ marginBottom: spacing.xs }}>
-        Billing cycle
+        How often
       </AppText>
       <SegmentedControl
         options={CYCLE_KEYS}
@@ -313,18 +354,45 @@ export default function EditorScreen() {
       ) : null}
 
       <Card padded={false} style={{ marginTop: spacing.lg }}>
+        {isBill ? (
+          <>
+            <Row
+              title="Autopay"
+              subtitle={
+                draft.autopay
+                  ? 'Paid automatically. You get a heads-up before each one.'
+                  : 'You pay it yourself. Mark it paid each time so nothing slips.'
+              }
+              toggle={{ value: draft.autopay, onValueChange: (autopay) => patch({ autopay }) }}
+              testID="autopay-row"
+            />
+            <Row
+              title="Amount changes each time"
+              subtitle="For power, water or a credit card. Enter a typical amount."
+              toggle={{ value: draft.amountVaries, onValueChange: (amountVaries) => patch({ amountVaries }) }}
+              testID="varies-row"
+            />
+          </>
+        ) : null}
+        {!isBill ? (
         <Row
           title="Free trial"
           subtitle={trialDate ? `Ends ${formatDate(trialDate, languageTag)}` : 'Remind me before a trial turns into a paid plan'}
           toggle={{ value: draft.trialEndDate !== null, onValueChange: setTrial }}
           testID="trial-row"
         />
-        {draft.trialEndDate !== null ? (
+        ) : null}
+        {!isBill && draft.trialEndDate !== null ? (
           <Row title="Trial ends" value={trialDate ? formatDate(trialDate, languageTag) : ''} onPress={() => setSheet('trialDate')} testID="trial-date-row" />
         ) : null}
         <Row
-          title={draft.trialEndDate !== null ? 'First paid bill' : 'First bill date'}
-          subtitle={errors.firstBillDate ?? (nextRenewal.getTime() !== firstDate.getTime() ? `Next renewal: ${formatDate(nextRenewal, languageTag)}` : undefined)}
+          title={isBill ? 'First due date' : draft.trialEndDate !== null ? 'First paid bill' : 'First bill date'}
+          subtitle={
+            errors.firstBillDate ??
+            (nextRenewal.getTime() !== firstDate.getTime()
+              ? `${isBill ? 'Next due' : 'Next renewal'}: ${formatDate(nextRenewal, languageTag)}`
+              : undefined)
+          }
           value={formatDate(firstDate, languageTag)}
           onPress={() => setSheet('firstDate')}
           testID="first-date-row"
@@ -352,7 +420,7 @@ export default function EditorScreen() {
       <View style={{ marginTop: spacing.lg }}>
         <TextField
           label="Notes"
-          placeholder="Account email, plan tier, who shares it…"
+          placeholder={isBill ? 'Account number, how you pay, payee…' : 'Account email, plan tier, who shares it…'}
           value={draft.notes}
           onChangeText={(notes) => patch({ notes })}
           multiline
@@ -406,7 +474,7 @@ export default function EditorScreen() {
       <DateSheet
         visible={sheet === 'firstDate'}
         onClose={() => setSheet(null)}
-        title={draft.trialEndDate !== null ? 'First paid bill' : 'First bill date'}
+        title={isBill ? 'First due date' : draft.trialEndDate !== null ? 'First paid bill' : 'First bill date'}
         value={firstDate}
         onChange={(d) => {
           patch({ firstBillDate: toISODate(d) });

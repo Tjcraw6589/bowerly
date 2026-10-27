@@ -87,15 +87,16 @@ export default function OnboardingScreen() {
         <View style={styles.body}>
           <NestMark size={96} />
           <AppText variant="title" style={{ marginTop: spacing.xl }}>
-            Every subscription, one nest.
+            Every bill and subscription, in one place.
           </AppText>
           <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
-            See exactly what you pay each month and year, and get a nudge before anything renews.
+            Rent, utilities, insurance, loans, your phone plan and every subscription. See what goes out each month and get a nudge before anything is due.
           </AppText>
           <View style={{ marginTop: spacing.xl }}>
             <Feature icon="phone-portrait-outline" text="Works offline. Everything stays on your device." />
             <Feature icon="lock-closed-outline" text="No account, no bank link, no tracking of your data." />
-            <Feature icon="notifications-outline" text="Reminders before renewals and before free trials end." />
+            <Feature icon="checkmark-done-outline" text="Mark bills paid and see at a glance what is overdue." />
+            <Feature icon="notifications-outline" text="Reminders before due dates and before free trials end." />
           </View>
         </View>
       ) : null}
@@ -104,7 +105,7 @@ export default function OnboardingScreen() {
         <View style={styles.body}>
           <AppText variant="title">Which currency do you mostly pay in?</AppText>
           <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
-            You can still add subscriptions in any other currency later.
+            You can still add bills in any other currency later.
           </AppText>
           <View style={[styles.chips, { marginTop: spacing.xl }]}>
             {quickCurrencies.map((code) => (
@@ -133,9 +134,9 @@ export default function OnboardingScreen() {
 
       {step === 2 ? (
         <View style={styles.body}>
-          <AppText variant="title">Never miss a renewal</AppText>
+          <AppText variant="title">Never miss a due date</AppText>
           <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
-            Billnest can remind you a few days before each charge and before a free trial turns into a paid plan. Reminders are
+            Bowerly can remind you before each bill is due, nudge you if one you pay by hand slips past its date, and warn you before a free trial turns into a paid plan. Reminders are
             scheduled on your device; nothing is sent anywhere.
           </AppText>
           <AppText variant="small" tone="muted" style={{ marginTop: spacing.xl, marginBottom: spacing.sm }}>
@@ -159,7 +160,7 @@ export default function OnboardingScreen() {
           ) : null}
           {permissionDenied ? (
             <AppText variant="caption" tone="warning" style={{ marginTop: spacing.md }}>
-              Notifications are off for Billnest. You can turn them on any time from Settings.
+              Notifications are off for Bowerly. You can turn them on any time from Settings.
             </AppText>
           ) : null}
         </View>

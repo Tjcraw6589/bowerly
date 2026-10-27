@@ -35,7 +35,7 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Subscriptions', tabBarIcon: icon('layers', 'layers-outline') }} />
+      <Tabs.Screen name="index" options={{ title: 'Bills', tabBarIcon: icon('receipt', 'receipt-outline') }} />
       <Tabs.Screen name="upcoming" options={{ title: 'Upcoming', tabBarIcon: icon('calendar', 'calendar-outline') }} />
       <Tabs.Screen name="insights" options={{ title: 'Insights', tabBarIcon: icon('pie-chart', 'pie-chart-outline') }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('settings', 'settings-outline') }} />

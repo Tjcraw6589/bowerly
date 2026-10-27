@@ -40,7 +40,7 @@ function page(title, body) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Billnest ${title}</title>
+<title>Bowerly ${title}</title>
 <style>
   :root { color-scheme: light dark; --bg:#F6F5F0; --fg:#14201A; --muted:#5B6B63; --link:#1F7A5C; --card:#FFFFFF; --border:#E0E5DF; }
   @media (prefers-color-scheme: dark) { :root { --bg:#0F1613; --fg:#F2F5F1; --muted:#A6B3AA; --link:#4CC39A; --card:#182019; --border:#2B372F; } }
@@ -60,7 +60,7 @@ function page(title, body) {
 <article>
 ${body}
 </article>
-<footer>Billnest · Private, offline subscription tracking</footer>
+<footer>Bowerly · Private, offline bill tracking</footer>
 </main>
 </body>
 </html>
@@ -83,7 +83,7 @@ writeFileSync(
   join(htmlDir, 'index.html'),
   page(
     'Legal',
-    '<h1>Billnest</h1><p>Private, offline subscription tracking for iPhone and Android.</p><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Use</a></li></ul>',
+    '<h1>Bowerly</h1><p>Private, offline bill and subscription tracking for iPhone.</p><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Use</a></li></ul>',
   ),
 );
 

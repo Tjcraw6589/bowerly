@@ -24,7 +24,7 @@ interface StorePreview {
 }
 
 function storePreview(): StorePreview | null {
-  const value = (globalThis as { __BILLNEST_STORE_PREVIEW__?: StorePreview }).__BILLNEST_STORE_PREVIEW__;
+  const value = (globalThis as { __BOWERLY_STORE_PREVIEW__?: StorePreview }).__BOWERLY_STORE_PREVIEW__;
   return value && typeof value.priceString === 'string' ? value : null;
 }
 
@@ -40,7 +40,7 @@ export async function configurePurchases(_onProChange: (isPro: boolean) => void)
 
 export async function fetchProOffer(): Promise<ProOffer | null> {
   const preview = storePreview();
-  return preview ? { priceString: preview.priceString, productId: 'subtally_pro_lifetime', title: 'Billnest Pro' } : null;
+  return preview ? { priceString: preview.priceString, productId: 'subtally_pro_lifetime', title: 'Bowerly Pro' } : null;
 }
 
 export async function purchasePro(): Promise<PurchaseOutcome> {

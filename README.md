@@ -1,6 +1,6 @@
-# Billnest
+# Bowerly
 
-Private, offline subscription tracker for iOS and Android. Built with Expo SDK 58, React Native, TypeScript (strict) and Expo Router; ships through EAS Build.
+Private, offline tracker for bills and subscriptions (rent, utilities, insurance, loans, phone, streaming and apps), with mark-paid and overdue tracking. iOS first; Android-ready. Built with Expo SDK 58, React Native, TypeScript (strict) and Expo Router; ships through EAS Build.
 
 - `RESEARCH.md` — why this niche.
 - `PLAN.md` — features, stack, verified checklist and what could not be verified on this machine.

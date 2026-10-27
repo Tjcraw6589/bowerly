@@ -13,7 +13,7 @@ async function press(testID: string): Promise<void> {
   });
 }
 
-describe('Billnest end-to-end (router)', () => {
+describe('Bowerly end-to-end (router)', () => {
   beforeEach(() => resetStore({ onboardingComplete: false }));
 
   test('onboarding → empty list → add a subscription → it appears with totals', async () => {
@@ -50,12 +50,60 @@ describe('Billnest end-to-end (router)', () => {
     expect(screen.getByTestId('totals-amount').props.children).toBe('$15.49');
   });
 
+  test('a bill paid by hand can be added, marked paid and undone', async () => {
+    resetStore({ onboardingComplete: true });
+    await renderRouter('./src/app', { initialUrl: '/editor' });
+    await screen.findByTestId('editor-screen');
+    // New items start as hand-paid bills.
+    expect(screen.getByTestId('autopay-row')).toBeTruthy();
+    expect(screen.queryByTestId('trial-row')).toBeNull();
+    await act(async () => {
+      fireEvent.changeText(screen.getByTestId('name-field'), 'Rent');
+    });
+    await act(async () => {
+      fireEvent.changeText(screen.getByTestId('price-field'), '1200');
+    });
+    await press('editor-save');
+    await screen.findByTestId('subscriptions-screen');
+    const rent = useStore.getState().subscriptions[0]!;
+    expect(rent).toMatchObject({ name: 'Rent', kind: 'bill', autopay: false, paidThrough: null, price: 1200 });
+    expect(screen.getByTestId('totals-split')).toBeTruthy();
+
+    await press(`subscription-row-${rent.id}`);
+    await screen.findByTestId('detail-screen');
+    await press('action-mark-paid');
+    // Due today (the default first due date), so marking paid records today.
+    const today = new Date();
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    expect(useStore.getState().subscriptions[0]?.paidThrough).toBe(iso);
+    await press('action-undo-paid');
+    expect(useStore.getState().subscriptions[0]?.paidThrough).toBeNull();
+  });
+
+  test('switching to Subscription shows the free-trial option and saves the type', async () => {
+    resetStore({ onboardingComplete: true });
+    await renderRouter('./src/app', { initialUrl: '/editor' });
+    await screen.findByTestId('editor-screen');
+    await press('kind-subscription');
+    expect(screen.getByTestId('trial-row')).toBeTruthy();
+    expect(screen.queryByTestId('autopay-row')).toBeNull();
+    await act(async () => {
+      fireEvent.changeText(screen.getByTestId('name-field'), 'Spotify');
+    });
+    await act(async () => {
+      fireEvent.changeText(screen.getByTestId('price-field'), '10.99');
+    });
+    await press('editor-save');
+    await screen.findByTestId('subscriptions-screen');
+    expect(useStore.getState().subscriptions[0]).toMatchObject({ kind: 'subscription', autopay: true });
+  });
+
   test('validation blocks an empty form', async () => {
     resetStore({ onboardingComplete: true });
     await renderRouter('./src/app', { initialUrl: '/editor' });
     await screen.findByTestId('editor-screen');
     await press('editor-save');
-    expect(await screen.findByText('Give this subscription a name.')).toBeTruthy();
+    expect(await screen.findByText('Give this bill a name.')).toBeTruthy();
     expect(useStore.getState().subscriptions).toHaveLength(0);
   });
 
@@ -72,6 +120,10 @@ describe('Billnest end-to-end (router)', () => {
     resetStore({ onboardingComplete: true, isPro: true });
     useStore.getState().addSubscription({
       name: 'Spotify',
+      kind: 'subscription',
+      autopay: true,
+      amountVaries: false,
+      paidThrough: null,
       price: 10.99,
       currency: 'USD',
       cycle: { every: 1, unit: 'month' },

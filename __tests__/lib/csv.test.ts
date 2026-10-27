@@ -36,7 +36,7 @@ describe('export and import round trip', () => {
     ];
     const csv = subscriptionsToCSV(subs, BUILT_IN_CATEGORIES);
     expect(csv.split('\r\n')[0]).toBe(
-      'name,price,currency,cycle_every,cycle_unit,first_bill_date,category,color,emoji,notes,reminder_days_before,status,trial_end_date',
+      'name,type,price,amount_varies,autopay,paid_through,currency,cycle_every,cycle_unit,first_bill_date,category,color,emoji,notes,reminder_days_before,status,trial_end_date',
     );
     const result = parseSubscriptionsCSV(csv, BUILT_IN_CATEGORIES, defaults);
     expect(result.errors).toEqual([]);
@@ -103,5 +103,26 @@ describe('importing hand-made files', () => {
   test('rejects files without the required columns', () => {
     expect(parseSubscriptionsCSV('foo,bar\n1,2', BUILT_IN_CATEGORIES, defaults).errors[0]?.message).toContain('"name" and "price"');
     expect(parseSubscriptionsCSV('', BUILT_IN_CATEGORIES, defaults).errors[0]?.message).toContain('empty');
+  });
+});
+
+describe('bills in CSV', () => {
+  test('type, autopay, varying amounts and paid-through survive a round trip', () => {
+    const subs = [
+      makeSub({ name: 'Rent', kind: 'bill', autopay: false, paidThrough: '2026-10-01', categoryId: 'cat_housing' }),
+      makeSub({ name: 'Electricity', kind: 'bill', autopay: true, amountVaries: true, categoryId: 'cat_utilities' }),
+    ];
+    const result = parseSubscriptionsCSV(subscriptionsToCSV(subs, BUILT_IN_CATEGORIES), BUILT_IN_CATEGORIES, defaults);
+    expect(result.errors).toEqual([]);
+    expect(result.drafts[0]).toMatchObject({ kind: 'bill', autopay: false, amountVaries: false, paidThrough: '2026-10-01', categoryId: 'cat_housing' });
+    expect(result.drafts[1]).toMatchObject({ kind: 'bill', autopay: true, amountVaries: true, paidThrough: null, categoryId: 'cat_utilities' });
+  });
+
+  test('old files without a type column import as subscriptions; bad values are reported', () => {
+    const old = parseSubscriptionsCSV('name,price\nNetflix,15.49', BUILT_IN_CATEGORIES, defaults);
+    expect(old.drafts[0]).toMatchObject({ kind: 'subscription', autopay: true, amountVaries: false, paidThrough: null });
+    const bad = parseSubscriptionsCSV('name,price,type,autopay\nA,1,loan,yes\nB,1,bill,maybe', BUILT_IN_CATEGORIES, defaults);
+    expect(bad.drafts).toEqual([]);
+    expect(bad.errors.map((e) => e.row)).toEqual([2, 3]);
   });
 });

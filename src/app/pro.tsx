@@ -27,18 +27,18 @@ import { useTheme } from '@/theme/useTheme';
 const HEADLINES: Record<string, { title: string; body: string }> = {
   limit: {
     title: 'You have outgrown the free plan',
-    body: `Free Billnest tracks up to ${FREE_ACTIVE_LIMIT} active subscriptions. Pro removes the limit for good.`,
+    body: `Free Bowerly tracks up to ${FREE_ACTIVE_LIMIT} active bills and subscriptions. Pro removes the limit for good.`,
   },
-  export: { title: 'Take your data anywhere', body: 'Export every subscription to a CSV you can open in any spreadsheet.' },
-  import: { title: 'Bring your data in', body: 'Import subscriptions from a spreadsheet or another tracker in seconds.' },
+  export: { title: 'Take your data anywhere', body: 'Export every bill and subscription to a CSV you can open in any spreadsheet.' },
+  import: { title: 'Bring your data in', body: 'Import bills and subscriptions from a spreadsheet or another tracker in seconds.' },
   categories: { title: 'Organise it your way', body: 'Create, rename and recolour categories to match how you think about your spending.' },
   insights: { title: 'See the full picture', body: 'Category breakdowns and a 12-month timeline show exactly where your money goes.' },
-  general: { title: 'Billnest Pro', body: 'One payment. No subscription to track your subscriptions.' },
+  general: { title: 'Bowerly Pro', body: 'One payment, yours forever. No subscription to track your bills.' },
 };
 
 const FEATURES: { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }[] = [
   { icon: 'eye-off-outline', title: 'No ads', body: 'The banner disappears everywhere, forever.' },
-  { icon: 'infinite-outline', title: 'Unlimited subscriptions', body: `Track as many as you like instead of ${FREE_ACTIVE_LIMIT}.` },
+  { icon: 'infinite-outline', title: 'Unlimited bills', body: `Track as many as you like instead of ${FREE_ACTIVE_LIMIT}.` },
   { icon: 'pie-chart-outline', title: 'Full insights', body: 'Spend by category and a month-by-month projection.' },
   { icon: 'pricetags-outline', title: 'Custom categories', body: 'Add your own, with their own emoji and colour.' },
   { icon: 'document-text-outline', title: 'CSV export and import', body: 'Your data in a spreadsheet, in and out.' },

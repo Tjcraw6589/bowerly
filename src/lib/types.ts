@@ -8,10 +8,30 @@ export interface BillingCycle {
 
 export type SubscriptionStatus = 'active' | 'paused' | 'cancelled';
 
+/**
+ * What a recurring item is. Subscriptions renew and charge automatically.
+ * Bills (rent, utilities, insurance, loans, phone) may be autopaid or paid by hand.
+ */
+export type ItemKind = 'subscription' | 'bill';
+
+/**
+ * One recurring payment: a subscription or a bill. (The type keeps its original
+ * name because it is used everywhere; "item" in comments means either kind.)
+ */
 export interface Subscription {
   id: string;
   name: string;
-  /** Price per billing cycle in major currency units, e.g. 9.99. */
+  kind: ItemKind;
+  /** Bills only: paid automatically. Subscriptions are always treated as autopaid. */
+  autopay: boolean;
+  /** The amount changes from bill to bill (power, water); `price` is the usual estimate. */
+  amountVaries: boolean;
+  /**
+   * Manual bills only: the most recent due date the user marked as paid (yyyy-mm-dd),
+   * or null when none has been marked yet.
+   */
+  paidThrough: string | null;
+  /** Amount per billing cycle in major currency units, e.g. 9.99. */
   price: number;
   /** ISO 4217 currency code, e.g. USD. */
   currency: string;
@@ -67,7 +87,10 @@ export interface Meta {
   isPro: boolean;
 }
 
-export type UpcomingEventType = 'bill' | 'trialEnd';
+/** 'bill' means a charge or due date (for either kind); 'overdue' is a manual bill past its due date. */
+export type UpcomingEventType = 'bill' | 'trialEnd' | 'overdue';
+
+export type KindFilter = 'all' | ItemKind;
 
 export interface UpcomingEvent {
   subscription: Subscription;

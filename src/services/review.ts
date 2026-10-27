@@ -34,7 +34,7 @@ export async function maybeRequestReview(afterPositiveAction: boolean, now = new
   }
 }
 
-/** Opens the store page for a manual "Rate Billnest" row in settings. */
+/** Opens the store page for a manual "Rate Bowerly" row in settings. */
 export function storePageUrl(): string | null {
   try {
     return StoreReview.storeUrl();

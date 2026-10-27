@@ -10,14 +10,14 @@ export type PickOutcome = { ok: true; text: string; fileName: string } | { ok: f
 /** Writes the CSV to the cache directory and opens the system share sheet. */
 export async function exportCSVFile(csv: string, now = new Date()): Promise<ExportOutcome> {
   try {
-    const file = new File(Paths.cache, `billnest-export-${toISODate(now)}.csv`);
+    const file = new File(Paths.cache, `bowerly-export-${toISODate(now)}.csv`);
     if (file.exists) file.delete();
     file.create();
     await file.write(csv);
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(file.uri, {
         mimeType: 'text/csv',
-        dialogTitle: 'Export subscriptions',
+        dialogTitle: 'Export bills',
         UTI: 'public.comma-separated-values-text',
       });
       return { ok: true, uri: file.uri, shared: true };

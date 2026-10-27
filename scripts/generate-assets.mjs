@@ -1,6 +1,7 @@
 // Generates every image asset the app and stores need from one vector design:
 // app icon, Android adaptive icon layers, splash images (light/dark), notification icon, favicon.
 // Run: npm run assets
+import { Buffer } from 'node:buffer';
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,7 +18,7 @@ const LIGHT_BG = '#F6F5F0';
 const DARK_BG = '#0F1613';
 
 /**
- * The Billnest mark: a bill (receipt card) sitting in a nest (bowl), drawn inside a
+ * The Bowerly mark: a bill (receipt card) sitting in a nest (bowl), drawn inside a
  * 1000x1000 box.
  *  - fg: colour of the nest and the bill outline/lines
  *  - billFill: fill of the bill (usually the background colour, for contrast)
@@ -83,8 +84,8 @@ const feature = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="50
   ${gradientDefs}
   <rect width="1024" height="500" fill="url(#g)"/>
   <g transform="translate(90,70) scale(0.36)">${mark('#FFFFFF', PRIMARY)}</g>
-  <text x="470" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="92" font-weight="800" fill="#FFFFFF" letter-spacing="-2">Billnest</text>
-  <text x="472" y="285" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#DCF0E6">Every subscription, one nest.</text>
+  <text x="470" y="215" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="92" font-weight="800" fill="#FFFFFF" letter-spacing="-2">Bowerly</text>
+  <text x="472" y="285" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#DCF0E6">Every bill, one place.</text>
   <text x="472" y="345" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" fill="#BFE3D2">Private · Offline · No account · One-time Pro</text>
 </svg>`;
 mkdirSync(join(root, 'store'), { recursive: true });

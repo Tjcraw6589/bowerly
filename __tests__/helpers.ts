@@ -11,6 +11,10 @@ export function makeSub(overrides: Partial<Subscription> = {}): Subscription {
   return {
     id: `sub-${counter}`,
     name: `Service ${counter}`,
+    kind: 'subscription',
+    autopay: true,
+    amountVaries: false,
+    paidThrough: null,
     price: 10,
     currency: 'USD',
     cycle: { every: 1, unit: 'month' },

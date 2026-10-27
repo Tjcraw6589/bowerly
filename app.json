@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Billnest",
+    "name": "Bowerly",
     "slug": "subtally",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,14 +9,14 @@
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#F6F5F0",
     "primaryColor": "#1F7A5C",
-    "description": "Track every subscription and catch every renewal. Private, offline, no account. Pro is a one-time purchase.",
+    "description": "Track every bill and subscription, mark bills paid and never miss a due date. Private, offline, no account. Pro is a one-time purchase.",
     "ios": {
       "bundleIdentifier": "com.tyjcraw.subtally",
       "supportsTablet": true,
       "appStoreUrl": "https://apps.apple.com/app/id6827302207",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSUserTrackingUsageDescription": "Billnest shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
+        "NSUserTrackingUsageDescription": "Bowerly shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your bills and subscriptions never leave your device either way."
       },
       "privacyManifests": {
         "NSPrivacyTracking": true,
@@ -123,7 +123,7 @@
         {
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
-          "userTrackingUsageDescription": "Billnest shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way.",
+          "userTrackingUsageDescription": "Bowerly shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your bills and subscriptions never leave your device either way.",
           "delayAppMeasurementInit": true,
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
@@ -174,7 +174,7 @@
       [
         "expo-tracking-transparency",
         {
-          "userTrackingPermission": "Billnest shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your subscription data never leaves your device either way."
+          "userTrackingPermission": "Bowerly shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your bills and subscriptions never leave your device either way."
         }
       ],
       "expo-asset",

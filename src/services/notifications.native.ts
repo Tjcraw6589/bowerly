@@ -27,7 +27,7 @@ export async function ensureNotificationChannel(): Promise<void> {
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: 'Renewal reminders',
-    description: 'Reminders before a subscription renews or a free trial ends.',
+    description: 'Reminders before bills are due, overdue nudges and free-trial warnings.',
     importance: AndroidImportance.HIGH,
   });
 }

@@ -116,7 +116,7 @@ export default function CategoriesScreen() {
               key={c.id}
               left={<Avatar emoji={c.emoji} color={c.color} size={36} />}
               title={c.name}
-              subtitle={`${usage.get(c.id) ?? 0} subscription${(usage.get(c.id) ?? 0) === 1 ? '' : 's'}`}
+              subtitle={`${usage.get(c.id) ?? 0} ${(usage.get(c.id) ?? 0) === 1 ? 'item' : 'items'}`}
               right={
                 <Button
                   label="Delete"
@@ -149,7 +149,7 @@ export default function CategoriesScreen() {
         ))}
       </Card>
       <AppText variant="caption" tone="faint" style={{ marginTop: spacing.md }}>
-        {"Built-in categories can't be removed. Deleting one of yours moves its subscriptions to Other."}
+        {"Built-in categories can't be removed. Deleting one of yours moves its bills to Other."}
       </AppText>
       <View style={{ height: spacing.xl }} />
 
@@ -179,7 +179,7 @@ export default function CategoriesScreen() {
       <ConfirmSheet
         visible={deleting !== null}
         title={`Delete ${deleting?.name ?? ''}?`}
-        message={`${usage.get(deleting?.id ?? '') ?? 0} subscription(s) will move to Other.`}
+        message={`${usage.get(deleting?.id ?? '') ?? 0} item(s) will move to Other.`}
         confirmLabel="Delete category"
         destructive
         onConfirm={confirmDelete}

@@ -1,7 +1,7 @@
 import { OTHER_CATEGORY_ID } from '@/lib/categories';
 import { FREE_ACTIVE_LIMIT } from '@/lib/limits';
 import type { SubscriptionDraft } from '@/lib/types';
-import { useStore } from '@/store/useStore';
+import { migrateState, useStore } from '@/store/useStore';
 
 import { makeSub, resetStore } from '../helpers';
 
@@ -122,5 +122,51 @@ describe('import and reset', () => {
     expect(state.categories.every((c) => c.builtIn)).toBe(true);
     expect(state.settings.currency).toBe('GBP');
     expect(state.meta.isPro).toBe(true);
+  });
+});
+
+describe('bills', () => {
+  test('mark paid and undo move the paid-through date for hand-paid bills only', () => {
+    const today = new Date(2026, 9, 22);
+    const store = useStore.getState();
+    const result = store.addSubscription(draft({ name: 'Rent', kind: 'bill', autopay: false, firstBillDate: '2026-10-01' }));
+    if (!result.ok) throw new Error('unreachable');
+    // Pretend it was added on 1 Sep so 1 Oct counts as overdue.
+    useStore.setState((s) => ({ subscriptions: s.subscriptions.map((x) => ({ ...x, createdAt: '2026-09-01T00:00:00.000Z' })) }));
+    store.markPaid(result.subscription.id, today);
+    expect(useStore.getState().subscriptions[0]?.paidThrough).toBe('2026-10-01');
+    store.markPaid(result.subscription.id, today);
+    expect(useStore.getState().subscriptions[0]?.paidThrough).toBe('2026-11-01');
+    store.undoPaid(result.subscription.id);
+    expect(useStore.getState().subscriptions[0]?.paidThrough).toBe('2026-10-01');
+
+    const sub = store.addSubscription(draft({ name: 'Netflix' }));
+    if (!sub.ok) throw new Error('unreachable');
+    store.markPaid(sub.subscription.id, today);
+    expect(useStore.getState().subscriptions[1]?.paidThrough).toBeNull();
+  });
+});
+
+describe('migration', () => {
+  test('v1 data becomes subscriptions with defaults and gains the bill categories', () => {
+    const { kind: _k, autopay: _a, amountVaries: _v, paidThrough: _p, ...old } = makeSub({ name: 'Old Netflix' });
+    const v1 = {
+      subscriptions: [old],
+      categories: [
+        { id: 'cat_streaming', name: 'Streaming', emoji: '🎬', color: '#E53958', builtIn: true },
+        { id: 'cat_utilities', name: 'Utilities & Bills', emoji: '🏠', color: '#14B8A6', builtIn: true },
+        { id: OTHER_CATEGORY_ID, name: 'Other', emoji: '📦', color: '#9CA3AF', builtIn: true },
+        { id: 'custom-1', name: 'Pets', emoji: '🐾', color: '#000000', builtIn: false },
+      ],
+    };
+    const migrated = migrateState(v1, 1);
+    expect(migrated.subscriptions?.[0]).toMatchObject({ name: 'Old Netflix', kind: 'subscription', autopay: true, amountVaries: false, paidThrough: null });
+    const ids = migrated.categories?.map((c) => c.id) ?? [];
+    expect(ids).toEqual(expect.arrayContaining(['cat_housing', 'cat_insurance', 'cat_finance', 'custom-1']));
+    expect(migrated.categories?.find((c) => c.id === 'cat_utilities')?.name).toBe('Utilities');
+    expect(migrated.categories?.find((c) => c.id === 'custom-1')?.name).toBe('Pets');
+    // Already-current data passes through untouched.
+    const current = { subscriptions: [makeSub({ kind: 'bill', autopay: false, paidThrough: '2026-10-01' })] };
+    expect(migrateState(current, 2).subscriptions?.[0]).toMatchObject({ kind: 'bill', paidThrough: '2026-10-01' });
   });
 });

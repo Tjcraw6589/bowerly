@@ -146,6 +146,6 @@ describe('monthlyTimeline', () => {
 describe('counts', () => {
   test('tallies statuses and trials', () => {
     const subs = [makeSub(), makeSub({ trialEndDate: '2026-12-01', firstBillDate: '2026-12-02' }), makeSub({ status: 'paused' }), makeSub({ status: 'cancelled' })];
-    expect(counts(subs, TODAY)).toEqual({ active: 2, paused: 1, cancelled: 1, trials: 1 });
+    expect(counts(subs, TODAY)).toEqual({ active: 2, paused: 1, cancelled: 1, trials: 1, bills: 0, subscriptions: 2, overdue: 0 });
   });
 });

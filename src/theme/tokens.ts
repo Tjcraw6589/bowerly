@@ -22,7 +22,7 @@ export interface ThemeColors {
   proSoft: string;
 }
 
-// Billnest palette: a deep "nest" green as the primary, warm sand neutrals, straw amber for Pro.
+// Bowerly palette: a deep "nest" green as the primary, warm sand neutrals, straw amber for Pro.
 export const lightColors: ThemeColors = {
   background: '#F6F5F0',
   surface: '#FFFFFF',

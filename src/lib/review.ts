@@ -11,7 +11,7 @@ export interface ReviewGateInput {
   meta: Meta;
   activeCount: number;
   now: Date;
-  /** True right after the user finished something satisfying, like saving a subscription. */
+  /** True right after the user finished something satisfying, like saving a bill. */
   afterPositiveAction: boolean;
 }
 

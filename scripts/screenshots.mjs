@@ -27,12 +27,10 @@ const now = new Date();
 const y = now.getFullYear();
 const m = now.getMonth() + 1;
 const d = now.getDate();
-const soon = (offset) => {
-  const t = new Date(y, m - 1, d + offset);
-  return iso(t.getFullYear(), t.getMonth() + 1, t.getDate());
-};
-const anchor = (monthsBack, day) => {
-  const t = new Date(y, m - 1 - monthsBack, Math.min(day, 28));
+
+/** A date `offset` days from today, `monthsBack` months earlier (for anchoring monthly items). */
+const shifted = (offset, monthsBack = 0) => {
+  const t = new Date(y, m - 1 - monthsBack, d + offset);
   return iso(t.getFullYear(), t.getMonth() + 1, t.getDate());
 };
 
@@ -40,6 +38,10 @@ function sub(id, name, price, cycle, firstBillDate, categoryId, color, emoji, ex
   return {
     id,
     name,
+    kind: 'subscription',
+    autopay: true,
+    amountVaries: false,
+    paidThrough: null,
     price,
     currency: 'USD',
     cycle,
@@ -58,34 +60,55 @@ function sub(id, name, price, cycle, firstBillDate, categoryId, color, emoji, ex
   };
 }
 
+/** A bill. Hand-paid bills are marked paid through the due date before the one shown. */
+function bill(id, name, price, cycle, dueOffset, categoryId, color, emoji, extra = {}) {
+  const autopay = extra.autopay ?? true;
+  return sub(id, name, price, cycle, shifted(dueOffset, 9), categoryId, color, emoji, {
+    kind: 'bill',
+    autopay,
+    paidThrough: autopay ? null : shifted(dueOffset, 1),
+    ...extra,
+  });
+}
+
 const monthly = { every: 1, unit: 'month' };
 const yearly = { every: 1, unit: 'year' };
 
 const seededSubscriptions = [
-  sub('s1', 'Netflix', 15.49, monthly, anchor(8, Math.min(d + 2, 28)), 'cat_streaming', '#E50914', '🎬'),
-  sub('s2', 'Spotify', 10.99, monthly, anchor(5, Math.min(d + 5, 28)), 'cat_music', '#1DB954', '🎧'),
-  sub('s3', 'iCloud+', 2.99, monthly, anchor(12, Math.min(d + 9, 28)), 'cat_cloud', '#3693F3', '☁️'),
-  sub('s4', 'Xbox Game Pass', 16.99, monthly, anchor(3, Math.min(d + 13, 28)), 'cat_gaming', '#107C10', '🎮'),
-  sub('s5', 'Amazon Prime', 139, yearly, anchor(7, 14), 'cat_utilities', '#FF9900', '🛒'),
-  sub('s6', 'Gym membership', 39, monthly, anchor(10, 1), 'cat_fitness', '#F97316', '🏋️'),
-  sub('s7', 'The New York Times', 4, { every: 1, unit: 'week' }, anchor(2, Math.min(d + 1, 28)), 'cat_news', '#000000', '📰'),
-  sub('s8', 'Audible', 14.95, monthly, soon(8), 'cat_news', '#F8991C', '🎙️', { trialEndDate: soon(7), reminderDaysBefore: 3 }),
-  sub('s9', '1Password', 35.88, yearly, anchor(4, 20), 'cat_software', '#0094F5', '🔒'),
-  sub('s10', 'Headspace', 69.99, yearly, anchor(1, 8), 'cat_fitness', '#F47D31', '🧘', { status: 'paused' }),
+  bill('b1', 'Rent', 1450, monthly, 4, 'cat_housing', '#64748B', '🏠', { autopay: false, notes: 'Pay via landlord portal', reminderDaysBefore: 3 }),
+  bill('b2', 'Electricity', 96, monthly, -2, 'cat_utilities', '#F59E0B', '💡', { autopay: false, amountVaries: true }),
+  bill('b3', 'Car insurance', 132, monthly, 6, 'cat_insurance', '#CA8A04', '🚗'),
+  bill('b4', 'Phone plan', 65, monthly, 11, 'cat_phone', '#06B6D4', '📱'),
+  bill('b5', 'Internet', 70, monthly, 15, 'cat_phone', '#0EA5E9', '🌐'),
+  bill('b6', 'Student loan', 220, monthly, 19, 'cat_finance', '#B45309', '🎓'),
+  bill('b7', 'Water', 48, { every: 3, unit: 'month' }, 23, 'cat_utilities', '#0284C7', '💧', { autopay: false, amountVaries: true }),
+  sub('s1', 'Netflix', 15.49, monthly, shifted(2, 8), 'cat_streaming', '#E50914', '🎬'),
+  sub('s2', 'Spotify', 10.99, monthly, shifted(5, 5), 'cat_music', '#1DB954', '🎧'),
+  sub('s3', 'iCloud+', 2.99, monthly, shifted(9, 12), 'cat_cloud', '#3693F3', '☁️'),
+  sub('s6', 'Gym membership', 39, monthly, shifted(-25, 10), 'cat_fitness', '#F97316', '🏋️'),
+  sub('s8', 'Audible', 14.95, monthly, shifted(8), 'cat_news', '#F8991C', '🎙️', { trialEndDate: shifted(7), reminderDaysBefore: 3 }),
+  sub('s5', 'Amazon Prime', 139, yearly, shifted(-60, 7), 'cat_other', '#FF9900', '🛒'),
+  sub('s9', '1Password', 35.88, yearly, shifted(-140, 4), 'cat_software', '#0094F5', '🔒'),
+  sub('s10', 'Headspace', 69.99, yearly, shifted(-20, 1), 'cat_fitness', '#F47D31', '🧘', { status: 'paused' }),
 ];
 
 const builtInCategories = [
-  { id: 'cat_streaming', name: 'Streaming', emoji: '🎬', color: '#E53958', builtIn: true },
-  { id: 'cat_music', name: 'Music', emoji: '🎵', color: '#1DB954', builtIn: true },
-  { id: 'cat_software', name: 'Software', emoji: '💻', color: '#3D5AFE', builtIn: true },
-  { id: 'cat_cloud', name: 'Cloud & Storage', emoji: '☁️', color: '#0EA5E9', builtIn: true },
-  { id: 'cat_gaming', name: 'Gaming', emoji: '🎮', color: '#8B5CF6', builtIn: true },
-  { id: 'cat_fitness', name: 'Health & Fitness', emoji: '💪', color: '#F97316', builtIn: true },
-  { id: 'cat_news', name: 'News & Reading', emoji: '📰', color: '#64748B', builtIn: true },
-  { id: 'cat_utilities', name: 'Home & Utilities', emoji: '🏠', color: '#14B8A6', builtIn: true },
-  { id: 'cat_finance', name: 'Finance & Insurance', emoji: '💳', color: '#CA8A04', builtIn: true },
-  { id: 'cat_other', name: 'Other', emoji: '📦', color: '#9CA3AF', builtIn: true },
-];
+  ['cat_housing', 'Housing', '🏠', '#64748B'],
+  ['cat_utilities', 'Utilities', '💡', '#14B8A6'],
+  ['cat_phone', 'Phone & Internet', '📱', '#06B6D4'],
+  ['cat_insurance', 'Insurance', '🛡️', '#CA8A04'],
+  ['cat_finance', 'Loans & Credit', '💳', '#B45309'],
+  ['cat_transport', 'Transport', '🚗', '#0F766E'],
+  ['cat_taxes', 'Taxes & Fees', '🧾', '#9333EA'],
+  ['cat_streaming', 'Streaming', '🎬', '#E53958'],
+  ['cat_music', 'Music', '🎵', '#1DB954'],
+  ['cat_software', 'Software', '💻', '#3D5AFE'],
+  ['cat_cloud', 'Cloud & Storage', '☁️', '#0EA5E9'],
+  ['cat_gaming', 'Gaming', '🎮', '#8B5CF6'],
+  ['cat_fitness', 'Health & Fitness', '💪', '#F97316'],
+  ['cat_news', 'News & Reading', '📰', '#64748B'],
+  ['cat_other', 'Other', '📦', '#9CA3AF'],
+].map(([id, name, emoji, color]) => ({ id, name, emoji, color, builtIn: true }));
 
 function persistedState(theme, isPro) {
   return JSON.stringify({
@@ -95,17 +118,17 @@ function persistedState(theme, isPro) {
       settings: { currency: 'USD', theme, reminderHour: 9, notificationsEnabled: true, onboardingComplete: true, summaryPeriod: 'month', sortBy: 'nextBill' },
       meta: { installedAt: '2026-01-01T00:00:00.000Z', sessionCount: 12, lastReviewPromptAt: null, reviewPromptCount: 0, isPro },
     },
-    version: 1,
+    version: 2,
   });
 }
 
 const SHOTS = [
-  { file: '01-subscriptions', path: '/', theme: 'light', pro: true, wait: 'subscriptions-screen' },
+  { file: '01-bills', path: '/', theme: 'light', pro: true, wait: 'subscriptions-screen' },
   { file: '02-upcoming', path: '/upcoming', theme: 'light', pro: true, wait: 'upcoming-screen' },
   { file: '03-insights', path: '/insights', theme: 'light', pro: true, wait: 'insights-screen' },
-  { file: '04-detail', path: '/subscription/s8', theme: 'light', pro: true, wait: 'detail-screen' },
-  { file: '05-editor', path: '/editor?id=s1', theme: 'light', pro: true, wait: 'editor-screen' },
-  { file: '06-dark-subscriptions', path: '/', theme: 'dark', pro: true, wait: 'subscriptions-screen' },
+  { file: '04-detail', path: '/subscription/b1', theme: 'light', pro: true, wait: 'detail-screen' },
+  { file: '05-editor', path: '/editor?id=b2', theme: 'light', pro: true, wait: 'editor-screen' },
+  { file: '06-dark-bills', path: '/', theme: 'dark', pro: true, wait: 'subscriptions-screen' },
   { file: '07-pro', path: '/pro?reason=general', theme: 'dark', pro: false, wait: 'pro-screen' },
   { file: '08-onboarding', path: '/', theme: 'light', pro: false, wait: 'onboarding', fresh: true },
 ];
@@ -142,7 +165,7 @@ try {
       // Show the Pro screen as an iPhone user sees it (real App Store price), not the web-only notice.
       const store = device.name.startsWith('android') ? 'google' : 'apple';
       await page.addInitScript((s) => {
-        window.__BILLNEST_STORE_PREVIEW__ = { priceString: '$4.99', store: s };
+        window.__BOWERLY_STORE_PREVIEW__ = { priceString: '$4.99', store: s };
       }, store);
       if (!shot.fresh) {
         const state = persistedState(shot.theme, shot.pro);

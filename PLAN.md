@@ -1,10 +1,10 @@
-# Billnest — build plan
+# Bowerly — build plan
 
 Status legend: `[x]` done and verified, `[ ]` not started or in progress, `[-]` removed from scope (reason given).
 
 ## App
 
-**Billnest: Subscription Tracker.** Track every recurring charge, see what it costs per month and per year, and get a reminder before each renewal and before each free trial ends. Fully offline, no account, no bank linking. Free with a small banner ad; a one-time Pro purchase removes ads and unlocks power features.
+**Bowerly: Subscription Tracker.** Track every recurring charge, see what it costs per month and per year, and get a reminder before each renewal and before each free trial ends. Fully offline, no account, no bank linking. Free with a small banner ad; a one-time Pro purchase removes ads and unlocks power features.
 
 ## Core feature set
 
@@ -74,8 +74,8 @@ Everything in the Free column is fully usable with no network connection and no 
 ### Phase 4 — Verify (results from this machine, Windows 11, Node 24)
 - [x] `npx tsc --noEmit`: zero errors (with generated typed routes)
 - [x] `npx expo lint`: zero errors, zero warnings
-- [x] `npx jest --ci`: 9 suites, 74 tests, all passing
-- [x] `npx playwright test`: 7 passed against `dist/` served locally (2026-10-26, after the Billnest rename)
+- [x] `npx jest --ci`: 10 suites, 93 tests, all passing (2026-10-26, after the bills expansion)
+- [x] `npx playwright test`: 8 passed against a clean `dist/` export (2026-10-26, bills expansion and Bowerly rename)
 - [x] Walked every screen in a browser at a phone viewport (onboarding, list, editor with presets/calendar/trial, detail, upcoming, insights, settings, Pro, categories gate, legal) and fixed what was found (tab bar label clipping, duplicated legal date)
 - [x] Store screenshots generated at exact store sizes from the same build
 
@@ -94,6 +94,14 @@ Everything in the Free column is fully usable with no network connection and no 
 ### Phase 6 — Handoff
 - [x] `HANDOFF.md` with every remaining manual step, exact commands and links
 - [x] `npm run setup` interactive script that validates and writes AdMob, RevenueCat, Apple and Google identifiers into `app.json` and `eas.json`
+
+### Scope addition (2026-10-26) — all bills, not just subscriptions
+- [x] Each item is a Bill or a Subscription; bills are autopay or paid by hand, and can have an amount that changes (shown as "~")
+- [x] Mark paid / undo for hand-paid bills; overdue detection (from the day the bill was added, capped at 24 dates); overdue nudge notification the morning after a due date
+- [x] Bills tab with bills vs subscriptions totals, overdue count and type filter; Upcoming shows overdue first with one-tap Mark paid; Insights splits bills and subscriptions
+- [x] New bill categories (Housing, Utilities, Phone & Internet, Insurance, Loans & Credit, Transport, Taxes & Fees) and 24 bill presets
+- [x] Saved data from the first builds upgrades automatically (store version 2); CSV export/import carries type, autopay, amount_varies and paid_through
+- [x] App renamed Bowerly (Billnest was taken on the App Store); listing, legal pages, screenshots and feature graphic updated
 
 ### Removed from scope
 - [-] Bank or card linking, cloud sync, multi-device sync: deliberately excluded; they require a backend and are the weakness of the competition this app is positioned against.

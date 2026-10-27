@@ -2,14 +2,43 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { BUILT_IN_CATEGORIES, OTHER_CATEGORY_ID } from '@/lib/categories';
+import { BUILT_IN_CATEGORIES, mergeBuiltInCategories, OTHER_CATEGORY_ID } from '@/lib/categories';
 import { newId } from '@/lib/ids';
 import { canAddActiveSubscription } from '@/lib/limits';
 import { detectDeviceLocale } from '@/lib/locale';
+import { paidThroughAfterMarking, paidThroughAfterUndo } from '@/lib/payments';
 import type { Category, Meta, Settings, Subscription, SubscriptionDraft, SubscriptionStatus } from '@/lib/types';
 
+/** Internal storage key; never shown to users and kept stable so saved data survives renames. */
 export const STORAGE_KEY = 'subtally-store';
-export const STORE_VERSION = 1;
+export const STORE_VERSION = 2;
+
+interface PersistedState {
+  subscriptions?: Partial<Subscription>[];
+  categories?: Category[];
+  settings?: Settings;
+  meta?: Meta;
+}
+
+/**
+ * Upgrades saved data from older app versions.
+ * v1 -> v2: items gain kind/autopay/amountVaries/paidThrough (existing items were all
+ * subscriptions), and the new bill categories are added.
+ */
+export function migrateState(persisted: unknown, fromVersion: number): PersistedState {
+  const state = (persisted ?? {}) as PersistedState;
+  if (fromVersion < 2) {
+    state.subscriptions = (state.subscriptions ?? []).map((s) => ({
+      kind: 'subscription',
+      autopay: true,
+      amountVaries: false,
+      paidThrough: null,
+      ...s,
+    }));
+    state.categories = mergeBuiltInCategories(state.categories ?? [...BUILT_IN_CATEGORIES]);
+  }
+  return state;
+}
 
 export function createDefaultSettings(currency: string): Settings {
   return {
@@ -51,6 +80,10 @@ export interface StoreState {
   updateSubscription: (id: string, patch: Partial<SubscriptionDraft>) => void;
   removeSubscription: (id: string) => void;
   setSubscriptionStatus: (id: string, status: SubscriptionStatus) => AddResult | void;
+  /** Manual bills: marks the next unpaid due date (oldest overdue first) as paid. */
+  markPaid: (id: string, today: Date) => void;
+  /** Manual bills: undoes the most recent "mark paid". */
+  undoPaid: (id: string) => void;
 
   addCategory: (input: Omit<Category, 'id' | 'builtIn'>) => Category;
   updateCategory: (id: string, patch: Partial<Omit<Category, 'id' | 'builtIn'>>) => void;
@@ -147,6 +180,24 @@ export const useStore = create<StoreState>()(
         return;
       },
 
+      markPaid: (id, today) => {
+        set((state) => ({
+          subscriptions: state.subscriptions.map((s) =>
+            s.id === id && s.kind === 'bill' && !s.autopay
+              ? { ...s, paidThrough: paidThroughAfterMarking(s, today), updatedAt: nowISO() }
+              : s,
+          ),
+        }));
+      },
+
+      undoPaid: (id) => {
+        set((state) => ({
+          subscriptions: state.subscriptions.map((s) =>
+            s.id === id && s.paidThrough ? { ...s, paidThrough: paidThroughAfterUndo(s), updatedAt: nowISO() } : s,
+          ),
+        }));
+      },
+
       addCategory: (input) => {
         const category: Category = { ...input, name: input.name.trim(), id: newId(), builtIn: false };
         set((state) => ({ categories: [...state.categories, category] }));
@@ -240,7 +291,7 @@ export const useStore = create<StoreState>()(
         // Whether storage loaded or failed, the UI must render; a failure simply means defaults.
         useStore.setState({ hydrated: true });
       },
-      migrate: (persisted) => persisted as StoreState,
+      migrate: (persisted, version) => migrateState(persisted, version) as unknown as StoreState,
     },
   ),
 );

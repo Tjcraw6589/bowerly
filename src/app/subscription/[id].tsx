@@ -18,7 +18,9 @@ import { useLocale } from '@/hooks/useLocale';
 import { useToday } from '@/hooks/useToday';
 import { findCategory } from '@/lib/categories';
 import { formatDate, parseISODate, relativeDayLabel, upcomingBillDates } from '@/lib/dates';
+import { amountText, eventLabel, nextChargeHeading, paymentMethodLabel } from '@/lib/labels';
 import { cycleLabel, cycleShortLabel, formatMoney, monthlyCost, yearlyCost } from '@/lib/money';
+import { isDatePaid, isManualBill, overdueDates } from '@/lib/payments';
 import { isOnTrial, nextEvent, paidToDate } from '@/lib/stats';
 import { successHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
@@ -34,6 +36,8 @@ export default function SubscriptionDetailScreen() {
   const categories = useStore((s) => s.categories);
   const setStatus = useStore((s) => s.setSubscriptionStatus);
   const remove = useStore((s) => s.removeSubscription);
+  const markPaid = useStore((s) => s.markPaid);
+  const undoPaid = useStore((s) => s.undoPaid);
   const [confirm, setConfirm] = useState<null | 'delete' | 'cancel'>(null);
 
   const upcoming = useMemo(() => {
@@ -46,7 +50,7 @@ export default function SubscriptionDetailScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Header title="" dismiss="back" />
-        <EmptyState emoji="🫥" title="Subscription not found" body="It may have been deleted." actionLabel="Back" onAction={() => router.back()} />
+        <EmptyState emoji="🫥" title="Not found" body="It may have been deleted." actionLabel="Back" onAction={() => router.back()} />
       </Screen>
     );
   }
@@ -56,6 +60,15 @@ export default function SubscriptionDetailScreen() {
   const trial = isOnTrial(sub, today);
   const paid = paidToDate(sub, today);
   const startDate = parseISODate(sub.firstBillDate);
+  const manual = isManualBill(sub);
+  const overdue = overdueDates(sub, today);
+  const noun = sub.kind === 'bill' ? 'bill' : 'subscription';
+  const paidThroughDate = sub.paidThrough ? parseISODate(sub.paidThrough) : null;
+
+  const onMarkPaid = () => {
+    markPaid(sub.id, today);
+    successHaptic();
+  };
 
   const changeStatus = (status: 'active' | 'paused' | 'cancelled') => {
     const result = setStatus(sub.id, status);
@@ -104,9 +117,11 @@ export default function SubscriptionDetailScreen() {
           {sub.status === 'paused' ? <StatusPill label="Paused" /> : null}
           {sub.status === 'cancelled' ? <StatusPill label="Cancelled" tone="danger" /> : null}
           {trial ? <StatusPill label="Free trial" tone="warning" /> : null}
+          {overdue.length > 0 && sub.status === 'active' ? <StatusPill label="Overdue" tone="danger" /> : null}
+          <StatusPill label={paymentMethodLabel(sub)} />
         </View>
         <View style={[styles.priceRow, { marginTop: spacing.lg }]}>
-          <AppText variant="money">{formatMoney(sub.price, sub.currency, languageTag)}</AppText>
+          <AppText variant="money">{amountText(sub, languageTag)}</AppText>
           <AppText variant="h3" tone="muted" style={{ marginLeft: 4, marginBottom: 6 }}>
             {cycleShortLabel(sub.cycle)}
           </AppText>
@@ -115,19 +130,33 @@ export default function SubscriptionDetailScreen() {
           {cycleLabel(sub.cycle)} · {formatMoney(monthlyCost(sub.price, sub.cycle), sub.currency, languageTag)}/mo ·{' '}
           {formatMoney(yearlyCost(sub.price, sub.cycle), sub.currency, languageTag)}/yr
         </AppText>
+        {sub.amountVaries ? (
+          <AppText variant="caption" tone="faint">
+            Typical amount; the real one changes each time.
+          </AppText>
+        ) : null}
       </View>
 
       {event ? (
         <Card style={{ marginTop: spacing.xl }} testID="next-event-card">
           <View style={styles.nextRow}>
-            <Ionicons name={event.type === 'trialEnd' ? 'hourglass-outline' : 'refresh-circle-outline'} size={28} color={event.daysUntil <= 3 ? colors.warning : colors.primary} />
+            <Ionicons
+              name={event.type === 'overdue' ? 'alert-circle' : event.type === 'trialEnd' ? 'hourglass-outline' : manual ? 'calendar-outline' : 'refresh-circle-outline'}
+              size={28}
+              color={event.type === 'overdue' ? colors.danger : event.daysUntil <= 3 ? colors.warning : colors.primary}
+            />
             <View style={[styles.flex, { marginLeft: spacing.md }]}>
               <AppText variant="small" tone="muted">
-                {event.type === 'trialEnd' ? 'Trial ends' : 'Next renewal'}
+                {event.type === 'overdue' ? 'Overdue' : event.type === 'trialEnd' ? 'Trial ends' : nextChargeHeading(sub)}
               </AppText>
-              <AppText variant="h3">
-                {relativeDayLabel(event.daysUntil)} · {formatDate(event.date, languageTag)}
+              <AppText variant="h3" tone={event.type === 'overdue' ? 'danger' : 'text'} testID="next-event-label">
+                {event.type === 'overdue' ? eventLabel(event) : relativeDayLabel(event.daysUntil)} · {formatDate(event.date, languageTag)}
               </AppText>
+              {event.type === 'overdue' && overdue.length > 1 ? (
+                <AppText variant="caption" tone="danger">
+                  {overdue.length} due dates unpaid
+                </AppText>
+              ) : null}
               {event.type === 'trialEnd' ? (
                 <AppText variant="caption" tone="muted">
                   Then {formatMoney(sub.price, sub.currency, languageTag)}
@@ -136,13 +165,38 @@ export default function SubscriptionDetailScreen() {
               ) : null}
             </View>
           </View>
+          {manual && sub.status === 'active' ? (
+            <View style={[styles.payRow, { marginTop: spacing.md, gap: spacing.sm }]}>
+              <Button
+                label={`Mark ${formatDate(event.date, languageTag, { month: 'short', day: 'numeric' })} paid`}
+                onPress={onMarkPaid}
+                icon={<Ionicons name="checkmark-circle" size={16} color={colors.onPrimary} />}
+                style={styles.flex}
+                testID="action-mark-paid"
+              />
+              {sub.paidThrough ? (
+                <Button label="Undo" variant="secondary" onPress={() => undoPaid(sub.id)} testID="action-undo-paid" />
+              ) : null}
+            </View>
+          ) : null}
         </Card>
       ) : null}
 
       <SectionHeader title="Details" />
       <Card padded={false}>
-        <Row title="Paid so far" value={formatMoney(paid, sub.currency, languageTag)} chevron={false} />
-        <Row title={trial ? 'First paid bill' : 'First bill'} value={startDate ? formatDate(startDate, languageTag) : sub.firstBillDate} chevron={false} />
+        <Row title="Type" value={sub.kind === 'bill' ? '🧾 Bill' : '🔁 Subscription'} chevron={false} />
+        <Row title="How it's paid" value={paymentMethodLabel(sub)} chevron={false} />
+        {manual ? (
+          <Row
+            title="Last marked paid"
+            value={paidThroughDate ? formatDate(paidThroughDate, languageTag) : 'Not yet'}
+            chevron={false}
+            testID="paid-through-row"
+          />
+        ) : (
+          <Row title="Paid so far" value={formatMoney(paid, sub.currency, languageTag)} chevron={false} />
+        )}
+        <Row title={sub.kind === 'bill' ? 'First due date' : trial ? 'First paid bill' : 'First bill'} value={startDate ? formatDate(startDate, languageTag) : sub.firstBillDate} chevron={false} />
         <Row
           title="Reminder"
           value={
@@ -159,13 +213,13 @@ export default function SubscriptionDetailScreen() {
 
       {sub.status === 'active' ? (
         <>
-          <SectionHeader title="Upcoming charges" />
+          <SectionHeader title={sub.kind === 'bill' ? 'Upcoming due dates' : 'Upcoming charges'} />
           <Card padded={false} testID="upcoming-charges">
             {upcoming.map((d, i) => (
               <Row
                 key={d.toISOString()}
                 title={formatDate(d, languageTag, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                value={formatMoney(sub.price, sub.currency, languageTag)}
+                value={manual && isDatePaid(sub, d) ? 'Paid ✓' : amountText(sub, languageTag)}
                 chevron={false}
                 last={i === upcoming.length - 1}
               />
@@ -191,7 +245,7 @@ export default function SubscriptionDetailScreen() {
       <ConfirmSheet
         visible={confirm === 'delete'}
         title={`Delete ${sub.name}?`}
-        message="This removes the subscription and its reminders from this device. It cannot be undone."
+        message={`This removes the ${noun} and its reminders from this device. It cannot be undone.`}
         confirmLabel="Delete"
         destructive
         onConfirm={deleteSub}
@@ -201,7 +255,7 @@ export default function SubscriptionDetailScreen() {
       <ConfirmSheet
         visible={confirm === 'cancel'}
         title={`Mark ${sub.name} as cancelled?`}
-        message="Billnest keeps it in your history with the total you paid, stops the reminders and leaves it out of your totals."
+        message="Bowerly keeps it in your history, stops the reminders and leaves it out of your totals."
         confirmLabel="Mark cancelled"
         onConfirm={() => changeStatus('cancelled')}
         onCancel={() => setConfirm(null)}
@@ -216,6 +270,7 @@ const styles = StyleSheet.create({
   pills: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6 },
   priceRow: { flexDirection: 'row', alignItems: 'flex-end' },
   nextRow: { flexDirection: 'row', alignItems: 'center' },
+  payRow: { flexDirection: 'row' },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   flex: { flex: 1 },
 });

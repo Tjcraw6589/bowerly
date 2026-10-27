@@ -6,19 +6,19 @@ import { expect, test } from '@playwright/test';
  * way a new user would: onboarding, first subscription, every tab, Pro screen,
  * dark mode, and persistence across a reload.
  */
-test.describe('Billnest smoke', () => {
+test.describe('Bowerly smoke', () => {
   test('first run through every screen', async ({ page }) => {
     await page.goto('/');
 
     // Onboarding: three steps, under thirty seconds.
     await expect(page.getByTestId('onboarding')).toBeVisible();
-    await expect(page.getByText('Every subscription, one nest.')).toBeVisible();
+    await expect(page.getByText('Every bill and subscription, in one place.')).toBeVisible();
     await page.getByTestId('onboarding-next').click();
     await expect(page.getByText('Which currency do you mostly pay in?')).toBeVisible();
     await page.getByTestId('currency-chip-EUR').click();
     await page.getByTestId('currency-chip-USD').click();
     await page.getByTestId('onboarding-next').click();
-    await expect(page.getByText('Never miss a renewal')).toBeVisible();
+    await expect(page.getByText('Never miss a due date')).toBeVisible();
     await page.getByTestId('hour-chip-20').click();
     await page.getByTestId('onboarding-finish').click();
 
@@ -32,6 +32,8 @@ test.describe('Billnest smoke', () => {
     await page.getByTestId('name-field').fill('Net');
     await page.getByTestId('preset-Netflix').click();
     await expect(page.getByTestId('name-field')).toHaveValue('Netflix');
+    // The preset switched the type to Subscription, which offers a free trial.
+    await expect(page.getByTestId('trial-row')).toBeVisible();
     await page.getByTestId('price-field').fill('15.49');
     await page.getByTestId('cycle-year').click();
     await expect(page.getByText('$15.49 yearly')).toBeVisible();
@@ -76,7 +78,7 @@ test.describe('Billnest smoke', () => {
     await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(246, 245, 240)');
     await page.getByTestId('settings-privacy').click();
     await expect(page.getByTestId('legal-screen')).toBeVisible();
-    await expect(page.getByText('Billnest has no accounts, no sign-in, no cloud sync', { exact: false })).toBeVisible();
+    await expect(page.getByText('Bowerly has no accounts, no sign-in, no cloud sync', { exact: false })).toBeVisible();
     await page.getByTestId('header-dismiss').click();
 
     // Pro screen on the web reports that the store is unavailable and keeps the free app working.
@@ -98,9 +100,30 @@ test.describe('Billnest smoke', () => {
     // Data persists across a full reload and onboarding is not shown again.
     await page.reload();
     await expect(page.getByTestId('onboarding')).toHaveCount(0);
-    await page.getByRole('tab', { name: 'Subscriptions' }).click();
+    await page.getByRole('tab', { name: 'Bills' }).click();
     await expect(page.getByText('Netflix')).toBeVisible();
     await expect(page.getByTestId('totals-amount')).toHaveText('$185.88');
+  });
+
+  test('a bill paid by hand: add it, mark it paid from Upcoming, see it on the detail screen', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('onboarding-skip').click();
+    await page.getByTestId('empty-state-action').click();
+    await expect(page.getByTestId('autopay-row')).toBeVisible();
+    await page.getByTestId('name-field').fill('Rent');
+    await page.getByTestId('price-field').fill('1200');
+    await page.getByTestId('editor-save').click();
+    await expect(page.getByText('Rent', { exact: true })).toBeVisible();
+    await expect(page.getByText('Due today', { exact: false })).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Upcoming' }).click();
+    await page.locator('[data-testid^="mark-paid-"]').first().click();
+    await page.getByRole('tab', { name: 'Bills' }).click();
+    await page.getByText('Rent', { exact: true }).click();
+    await expect(page.getByTestId('paid-through-row')).toBeVisible();
+    await expect(page.getByTestId('paid-through-row')).not.toContainText('Not yet');
+    await page.getByTestId('action-undo-paid').click();
+    await expect(page.getByTestId('paid-through-row')).toContainText('Not yet');
   });
 
   test('the Pro screen opened directly can be dismissed', async ({ page }) => {
@@ -127,7 +150,7 @@ test.describe('Billnest smoke', () => {
     await expect(page.getByTestId('reset-sheet')).toBeVisible();
     await page.getByTestId('reset-sheet-confirm').click();
     await expect(page.getByTestId('settings-feedback')).toContainText('deleted');
-    await page.getByRole('tab', { name: 'Subscriptions' }).click();
+    await page.getByRole('tab', { name: 'Bills' }).click();
     await expect(page.getByTestId('empty-state')).toBeVisible();
   });
 });

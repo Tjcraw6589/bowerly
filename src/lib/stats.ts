@@ -12,6 +12,7 @@ import {
   startOfMonth,
 } from './dates';
 import { costForPeriod, roundMoney } from './money';
+import { isDatePaid, isManualBill, nextUnpaidDue, overdueDates } from './payments';
 import type { Category, Subscription, SummaryPeriod, UpcomingEvent } from './types';
 
 export function isOnTrial(sub: Subscription, today: Date): boolean {
@@ -116,20 +117,31 @@ export function mostExpensive(
     .slice(0, limit);
 }
 
-/** The next thing that will happen for a subscription: a trial ending or a bill. */
+/**
+ * The next thing that will happen for an item: an overdue manual bill, a trial ending,
+ * or the next charge / due date (skipping due dates already marked paid).
+ */
 export function nextEvent(sub: Subscription, today: Date): UpcomingEvent | null {
   if (!isActive(sub)) return null;
   const first = parseISODate(sub.firstBillDate);
   if (!first) return null;
+  const overdue = overdueDates(sub, today);
+  if (overdue.length > 0 && overdue[0]) {
+    return { subscription: sub, type: 'overdue', date: overdue[0], daysUntil: daysUntil(overdue[0], today) };
+  }
   if (isOnTrial(sub, today)) {
     const end = parseISODate(sub.trialEndDate ?? '');
     if (end) return { subscription: sub, type: 'trialEnd', date: end, daysUntil: daysUntil(end, today) };
   }
-  const date = nextBillDate(first, sub.cycle, today);
+  const date = nextUnpaidDue(sub, today) ?? nextBillDate(first, sub.cycle, today);
   return { subscription: sub, type: 'bill', date, daysUntil: daysUntil(date, today) };
 }
 
-/** Every renewal and trial end from today through today + withinDays, soonest first. */
+/**
+ * Every overdue manual bill, renewal, due date and trial end from today through
+ * today + withinDays. Overdue items come first (they are in the past), then soonest first.
+ * Due dates already marked paid are left out.
+ */
 export function upcomingEvents(subs: readonly Subscription[], today: Date, withinDays: number): UpcomingEvent[] {
   const t = startOfDay(today);
   const end = addDays(t, withinDays);
@@ -138,6 +150,9 @@ export function upcomingEvents(subs: readonly Subscription[], today: Date, withi
     if (!isActive(sub)) continue;
     const first = parseISODate(sub.firstBillDate);
     if (!first) continue;
+    for (const date of overdueDates(sub, t)) {
+      events.push({ subscription: sub, type: 'overdue', date, daysUntil: daysUntil(date, t) });
+    }
     if (isOnTrial(sub, t)) {
       const trialEnd = parseISODate(sub.trialEndDate ?? '');
       if (trialEnd && trialEnd.getTime() <= end.getTime()) {
@@ -145,6 +160,7 @@ export function upcomingEvents(subs: readonly Subscription[], today: Date, withi
       }
     }
     for (const date of billDatesInRange(first, sub.cycle, t, end)) {
+      if (isManualBill(sub) && isDatePaid(sub, date)) continue;
       events.push({ subscription: sub, type: 'bill', date, daysUntil: daysUntil(date, t) });
     }
   }
@@ -152,12 +168,39 @@ export function upcomingEvents(subs: readonly Subscription[], today: Date, withi
   return events;
 }
 
+/** Money still to pay across the events (charges and overdue bills; trial ends cost nothing). */
 export function sumEvents(events: readonly UpcomingEvent[], currency: string): number {
   let total = 0;
   for (const e of events) {
-    if (e.type === 'bill' && e.subscription.currency === currency) total += e.subscription.price;
+    if (e.type !== 'trialEnd' && e.subscription.currency === currency) total += e.subscription.price;
   }
   return roundMoney(total);
+}
+
+export interface KindTotals {
+  bills: number;
+  subscriptions: number;
+  billCount: number;
+  subscriptionCount: number;
+}
+
+/** Monthly or yearly cost split into bills and subscriptions, in one currency. */
+export function totalsByKind(subs: readonly Subscription[], period: SummaryPeriod, currency: string, today: Date): KindTotals {
+  const out: KindTotals = { bills: 0, subscriptions: 0, billCount: 0, subscriptionCount: 0 };
+  for (const s of payingSubs(subs, today)) {
+    if (s.currency !== currency) continue;
+    const cost = costForPeriod(s.price, s.cycle, period);
+    if (s.kind === 'bill') {
+      out.bills += cost;
+      out.billCount += 1;
+    } else {
+      out.subscriptions += cost;
+      out.subscriptionCount += 1;
+    }
+  }
+  out.bills = roundMoney(out.bills);
+  out.subscriptions = roundMoney(out.subscriptions);
+  return out;
 }
 
 /** Total paid so far: bills on or before today (or the cancellation date), times the price. */
@@ -215,14 +258,22 @@ export interface Counts {
   paused: number;
   cancelled: number;
   trials: number;
+  /** Active items by kind. */
+  bills: number;
+  subscriptions: number;
+  /** Active manual bills with at least one unpaid past due date. */
+  overdue: number;
 }
 
 export function counts(subs: readonly Subscription[], today: Date): Counts {
-  const out: Counts = { active: 0, paused: 0, cancelled: 0, trials: 0 };
+  const out: Counts = { active: 0, paused: 0, cancelled: 0, trials: 0, bills: 0, subscriptions: 0, overdue: 0 };
   for (const s of subs) {
     if (s.status === 'active') {
       out.active += 1;
+      if (s.kind === 'bill') out.bills += 1;
+      else out.subscriptions += 1;
       if (isOnTrial(s, today)) out.trials += 1;
+      if (overdueDates(s, today).length > 0) out.overdue += 1;
     } else if (s.status === 'paused') out.paused += 1;
     else out.cancelled += 1;
   }

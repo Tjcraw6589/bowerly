@@ -1,9 +1,9 @@
 import { monthlyCost } from './money';
 import { nextEvent } from './stats';
-import type { SortKey, Subscription } from './types';
+import type { KindFilter, SortKey, Subscription } from './types';
 
 export const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
-  { key: 'nextBill', label: 'Next renewal' },
+  { key: 'nextBill', label: 'Next due' },
   { key: 'name', label: 'Name' },
   { key: 'priceDesc', label: 'Price: high to low' },
   { key: 'priceAsc', label: 'Price: low to high' },
@@ -38,9 +38,11 @@ export function filterSubscriptions(
   subs: readonly Subscription[],
   query: string,
   categoryId: string | null,
+  kind: KindFilter = 'all',
 ): Subscription[] {
   const q = query.trim().toLowerCase();
   return subs.filter((s) => {
+    if (kind !== 'all' && s.kind !== kind) return false;
     if (categoryId && s.categoryId !== categoryId) return false;
     if (!q) return true;
     return s.name.toLowerCase().includes(q) || s.notes.toLowerCase().includes(q);
