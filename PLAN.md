@@ -67,15 +67,15 @@ Everything in the Free column is fully usable with no network connection and no 
 - [x] Purchases service: configure, offerings, purchase, restore, entitlement listener, unavailable state
 - [x] Rating prompt wired to the good-session gate after saving a subscription
 - [x] App icon, adaptive Android icon (foreground, background, monochrome), splash (light and dark), notification icon, favicon, Play feature graphic (`npm run assets`)
-- [x] Unit tests for all business logic (70 tests across dates, money, stats, CSV, review gate, limits, notifications, validation, sorting, presets, store)
+- [x] Unit tests for all business logic (70 unit tests plus 4 router smoke tests, 74 total, across dates, money, stats, CSV, review gate, limits, notifications, validation, sorting, presets, store)
 - [x] Router smoke tests in Jest (4 tests: onboarding → add → list; validation; Pro unavailable; insights with data)
-- [x] Playwright end-to-end smoke test against the web export (2 tests covering every screen, theme switch, persistence, delete-all)
+- [x] Playwright end-to-end tests against the web export (7 tests: first run through every screen, theme switch, persistence, delete-all, Pro screen dismiss, and a brand sweep that fails if any screen still says the old name)
 
 ### Phase 4 — Verify (results from this machine, Windows 11, Node 24)
 - [x] `npx tsc --noEmit`: zero errors (with generated typed routes)
 - [x] `npx expo lint`: zero errors, zero warnings
 - [x] `npx jest --ci`: 9 suites, 74 tests, all passing
-- [x] `npx playwright test`: 2 passed against `dist/` served locally
+- [x] `npx playwright test`: 7 passed against `dist/` served locally (2026-10-26, after the Billnest rename)
 - [x] Walked every screen in a browser at a phone viewport (onboarding, list, editor with presets/calendar/trial, detail, upcoming, insights, settings, Pro, categories gate, legal) and fixed what was found (tab bar label clipping, duplicated legal date)
 - [x] Store screenshots generated at exact store sizes from the same build
 
