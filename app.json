@@ -19,17 +19,8 @@
         "NSUserTrackingUsageDescription": "Bowerly shows a small ad to free users. Allowing tracking lets those ads be more relevant. Your bills and subscriptions never leave your device either way."
       },
       "privacyManifests": {
-        "NSPrivacyTracking": true,
-        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyTracking": false,
         "NSPrivacyCollectedDataTypes": [
-          {
-            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeDeviceID",
-            "NSPrivacyCollectedDataTypeLinked": false,
-            "NSPrivacyCollectedDataTypeTracking": true,
-            "NSPrivacyCollectedDataTypePurposes": [
-              "NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising"
-            ]
-          },
           {
             "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePurchaseHistory",
             "NSPrivacyCollectedDataTypeLinked": false,
