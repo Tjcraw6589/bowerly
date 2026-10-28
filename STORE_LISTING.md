@@ -17,6 +17,7 @@ Everything below fits each store's field limits (counts are given per field). Pa
 | Age rating | 4+ / Everyone |
 | Privacy policy URL | https://tjcraw6589.github.io/bowerly/privacy.html |
 | Support URL | https://tjcraw6589.github.io/bowerly/ |
+| Marketing URL | https://tjcraw6589.github.io/bowerly/ (AdMob reads the developer website from this field and looks for https://tjcraw6589.github.io/app-ads.txt, served by the `Tjcraw6589/tjcraw6589.github.io` repository) |
 | Support email | tyjcraw@gmail.com |
 
 The name "Bowerly" was checked against the App Store on 26 October 2026 and no app uses it.
