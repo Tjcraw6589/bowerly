@@ -66,11 +66,13 @@ export default function BillsScreen() {
   const showCategoryFilter = usedCategories.length > 1;
   const activeKind: KindFilter = showKindFilter ? kind : 'all';
   const activeCategory = showCategoryFilter && usedCategories.some((c) => c.id === categoryId) ? categoryId : null;
+  const showSearch = subs.length > 4;
+  const activeQuery = showSearch ? query : '';
   const sections = useMemo(() => {
-    const visible = sortSubscriptions(filterSubscriptions(subs, query, activeCategory, activeKind), settings.sortBy, today);
+    const visible = sortSubscriptions(filterSubscriptions(subs, activeQuery, activeCategory, activeKind), settings.sortBy, today);
     const group = (status: Subscription['status'], title: string) => ({ title, data: visible.filter((s) => s.status === status) });
     return [group('active', 'Active'), group('paused', 'Paused'), group('cancelled', 'Cancelled')].filter((g) => g.data.length > 0);
-  }, [subs, query, activeCategory, activeKind, settings.sortBy, today]);
+  }, [subs, activeQuery, activeCategory, activeKind, settings.sortBy, today]);
 
   const onAdd = () => {
     if (canAddActiveSubscription(tally.active, isPro)) router.push('/editor');
@@ -142,7 +144,7 @@ export default function BillsScreen() {
                 />
               </View>
             ) : null}
-            {subs.length > 4 ? (
+            {showSearch ? (
               <View style={{ marginTop: spacing.lg }}>
                 <TextField
                   placeholder="Search bills and subscriptions"
