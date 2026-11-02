@@ -119,7 +119,7 @@ test.describe('Bowerly smoke', () => {
     await page.getByRole('tab', { name: 'Upcoming' }).click();
     await page.locator('[data-testid^="mark-paid-"]').first().click();
     await page.getByRole('tab', { name: 'Bills' }).click();
-    await page.getByText('Rent', { exact: true }).click();
+    await page.getByTestId('subscriptions-screen').getByText('Rent', { exact: true }).click();
     await expect(page.getByTestId('paid-through-row')).toBeVisible();
     await expect(page.getByTestId('paid-through-row')).not.toContainText('Not yet');
     await page.getByTestId('action-undo-paid').click();

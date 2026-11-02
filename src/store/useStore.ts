@@ -6,7 +6,8 @@ import { BUILT_IN_CATEGORIES, mergeBuiltInCategories, OTHER_CATEGORY_ID } from '
 import { newId } from '@/lib/ids';
 import { canAddActiveSubscription } from '@/lib/limits';
 import { detectDeviceLocale } from '@/lib/locale';
-import { paidThroughAfterMarking, paidThroughAfterUndo } from '@/lib/payments';
+import { paidThroughAfterMarking, paidThroughAfterReschedule, paidThroughAfterUndo, paidThroughOnResume } from '@/lib/payments';
+import { chargesWhileStopped } from '@/lib/stats';
 import type { Category, Meta, Settings, Subscription, SubscriptionDraft, SubscriptionStatus } from '@/lib/types';
 
 /** Internal storage key; never shown to users and kept stable so saved data survives renames. */
@@ -136,17 +137,18 @@ export const useStore = create<StoreState>()(
 
       updateSubscription: (id, patch) => {
         set((state) => ({
-          subscriptions: state.subscriptions.map((s) =>
-            s.id === id
-              ? {
-                  ...s,
-                  ...patch,
-                  name: (patch.name ?? s.name).trim(),
-                  notes: (patch.notes ?? s.notes).trim(),
-                  updatedAt: nowISO(),
-                }
-              : s,
-          ),
+          subscriptions: state.subscriptions.map((s) => {
+            if (s.id !== id) return s;
+            const next: Subscription = {
+              ...s,
+              ...patch,
+              name: (patch.name ?? s.name).trim(),
+              notes: (patch.notes ?? s.notes).trim(),
+              updatedAt: nowISO(),
+            };
+            // A new due day keeps the bills already marked paid as paid.
+            return { ...next, paidThrough: paidThroughAfterReschedule(s, next) };
+          }),
         }));
       },
 
@@ -172,6 +174,13 @@ export const useStore = create<StoreState>()(
                   ...s,
                   status,
                   cancelledAt: status === 'cancelled' ? stamp : null,
+                  // pausedAt holds when charging stopped (paused or cancelled). Remember it, and on resume how many
+                  // charges were skipped, and on resume how many charges were skipped,
+                  // so "paid so far" does not count months it was paused.
+                  pausedAt: status === 'active' ? null : s.status === 'active' ? stamp : (s.pausedAt ?? s.cancelledAt ?? s.updatedAt),
+                  skippedCharges: status === 'active' ? (s.skippedCharges ?? 0) + chargesWhileStopped(s, new Date()) : (s.skippedCharges ?? 0),
+                  // Due dates that passed while a hand-paid bill was paused or cancelled are not owed.
+                  paidThrough: status === 'active' ? paidThroughOnResume(s, new Date()) : s.paidThrough,
                   updatedAt: stamp,
                 }
               : s,

@@ -1,6 +1,6 @@
 import { addDays, billDatesInRange, formatShortDate, parseISODate, startOfDay, toISODate } from './dates';
 import { cycleShortLabel, formatMoney } from './money';
-import { isDatePaid, isManualBill } from './payments';
+import { isDatePaid, isManualBill, trackingStart } from './payments';
 import { isOnTrial } from './stats';
 import type { Settings, Subscription } from './types';
 
@@ -85,7 +85,10 @@ export function buildNotificationPlan(
     }
 
     const manual = isManualBill(sub);
-    for (const date of billDatesInRange(first, sub.cycle, today, horizon, 12)) {
+    const tracked = trackingStart(sub).getTime();
+    // Starts at yesterday so a bill due yesterday still gets this morning's overdue nudge when the
+    // plan is rebuilt early in the day (its own reminder is in the past and is skipped below).
+    for (const date of billDatesInRange(first, sub.cycle, addDays(today, -1), horizon, 13)) {
       if (manual && isDatePaid(sub, date)) continue;
       const fireAt = fireTime(date, daysBefore, settings.reminderHour);
       if (fireAt.getTime() > now.getTime()) {
@@ -97,7 +100,7 @@ export function buildNotificationPlan(
           body: dueBody(sub, daysBefore, date, locale),
         });
       }
-      if (manual) {
+      if (manual && date.getTime() >= tracked) {
         // A nudge the morning after the due date. Marking the bill paid reschedules and drops it.
         const lateAt = fireTime(addDays(date, 1), 0, settings.reminderHour);
         if (lateAt.getTime() > now.getTime()) {

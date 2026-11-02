@@ -4,6 +4,14 @@ import { createDefaultMeta, createDefaultSettings, useStore } from '@/store/useS
 
 export const TODAY = new Date(2026, 9, 22); // 22 October 2026, local midnight
 
+/** A timestamp at a local wall clock time, so a fixture means the same day in every time zone. */
+export function local(stamp: string): string {
+  const [day, time = '12:00'] = stamp.split('T') as [string, string?];
+  const [y, m, d] = day.split('-').map(Number) as [number, number, number];
+  const [h, mi] = time.split(':').map(Number) as [number, number];
+  return new Date(y, m - 1, d, h, mi).toISOString();
+}
+
 let counter = 0;
 
 export function makeSub(overrides: Partial<Subscription> = {}): Subscription {
@@ -26,8 +34,8 @@ export function makeSub(overrides: Partial<Subscription> = {}): Subscription {
     reminderDaysBefore: 1,
     status: 'active',
     trialEndDate: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
+    createdAt: local('2026-01-01T00:00'),
+    updatedAt: local('2026-01-01T00:00'),
     cancelledAt: null,
     ...overrides,
   };

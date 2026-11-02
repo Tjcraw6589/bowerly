@@ -1,6 +1,7 @@
 import { OTHER_CATEGORY_ID } from './categories';
 import { isValidISODate, toISODate } from './dates';
 import { parsePriceInput } from './money';
+import { MAX_NOTES_LENGTH, validateDraft } from './validation';
 import type { Category, CycleUnit, ItemKind, Subscription, SubscriptionDraft, SubscriptionStatus } from './types';
 
 export const CSV_HEADERS = [
@@ -23,9 +24,22 @@ export const CSV_HEADERS = [
   'trial_end_date',
 ] as const;
 
+/**
+ * Spreadsheets run a cell that starts with one of these as a formula. Apostrophes in front are
+ * included so the guard below can always be undone exactly ("'=x" exports as "''=x").
+ */
+const FORMULA_START = /^'*[=+\-@\t\r]/;
+
 export function csvEscape(value: string): string {
-  if (/[",\r\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
-  return value;
+  // A leading apostrophe makes Excel and Sheets show the text instead of running it (CSV injection).
+  const safe = FORMULA_START.test(value) ? `'${value}` : value;
+  if (/[",\r\n]/.test(safe)) return `"${safe.replace(/"/g, '""')}"`;
+  return safe;
+}
+
+/** Undoes csvEscape's formula guard when reading a file back. */
+function unguard(value: string): string {
+  return value.startsWith("'") && FORMULA_START.test(value) ? value.slice(1) : value;
 }
 
 /** RFC 4180 parser: handles quoted fields, escaped quotes, embedded newlines, CRLF and LF. */
@@ -182,7 +196,7 @@ export function parseSubscriptionsCSV(
   const allCategories: Category[] = [...categories];
   const cell = (r: string[], name: string): string => {
     const i = col(name);
-    return i < 0 ? '' : (r[i] ?? '').trim();
+    return i < 0 ? '' : unguard((r[i] ?? '').trim());
   };
 
   for (let r = 1; r < rows.length; r++) {
@@ -256,6 +270,37 @@ export function parseSubscriptionsCSV(
       continue;
     }
 
+    // The same checks the editor applies, so an import can never hold what the app would refuse.
+    const notes = cell(row, 'notes');
+    const checks = validateDraft({
+      name,
+      kind,
+      autopay: kind === 'bill' ? autopay : true,
+      amountVaries,
+      paidThrough: null,
+      price,
+      currency,
+      cycle: { every, unit },
+      firstBillDate,
+      categoryId: OTHER_CATEGORY_ID,
+      color: '#64748B',
+      emoji: '',
+      notes,
+      reminderDaysBefore,
+      status: statusText as SubscriptionStatus,
+      trialEndDate: kind === 'bill' ? null : trialText || null,
+      cancelledAt: null,
+    });
+    const problem = Object.values(checks).find((m) => typeof m === 'string');
+    if (problem) {
+      errors.push({ row: rowNumber, message: `"${name.slice(0, 40)}": ${problem}` });
+      continue;
+    }
+    if (notes.length > MAX_NOTES_LENGTH) {
+      errors.push({ row: rowNumber, message: `Notes for "${name}" are longer than ${MAX_NOTES_LENGTH} characters.` });
+      continue;
+    }
+
     const categoryName = cell(row, 'category');
     let category = categoryName
       ? allCategories.find((c) => c.name.toLowerCase() === categoryName.toLowerCase())
@@ -288,10 +333,10 @@ export function parseSubscriptionsCSV(
       categoryId: category.id,
       color,
       emoji: cell(row, 'emoji') || category.emoji,
-      notes: cell(row, 'notes'),
+      notes,
       reminderDaysBefore,
       status: statusText as SubscriptionStatus,
-      trialEndDate: trialText || null,
+      trialEndDate: kind === 'bill' ? null : trialText || null,
       cancelledAt: statusText === 'cancelled' ? defaults.today.toISOString() : null,
     });
   }

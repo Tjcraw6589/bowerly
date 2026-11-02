@@ -3,7 +3,7 @@ import { FREE_ACTIVE_LIMIT } from '@/lib/limits';
 import type { SubscriptionDraft } from '@/lib/types';
 import { migrateState, useStore } from '@/store/useStore';
 
-import { makeSub, resetStore } from '../helpers';
+import { makeSub, resetStore, local } from '../helpers';
 
 function draft(overrides: Partial<SubscriptionDraft> = {}): SubscriptionDraft {
   const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = makeSub();
@@ -132,7 +132,7 @@ describe('bills', () => {
     const result = store.addSubscription(draft({ name: 'Rent', kind: 'bill', autopay: false, firstBillDate: '2026-10-01' }));
     if (!result.ok) throw new Error('unreachable');
     // Pretend it was added on 1 Sep so 1 Oct counts as overdue.
-    useStore.setState((s) => ({ subscriptions: s.subscriptions.map((x) => ({ ...x, createdAt: '2026-09-01T00:00:00.000Z' })) }));
+    useStore.setState((s) => ({ subscriptions: s.subscriptions.map((x) => ({ ...x, createdAt: local('2026-09-01T00:00') })) }));
     store.markPaid(result.subscription.id, today);
     expect(useStore.getState().subscriptions[0]?.paidThrough).toBe('2026-10-01');
     store.markPaid(result.subscription.id, today);

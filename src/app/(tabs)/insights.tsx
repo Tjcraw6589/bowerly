@@ -40,6 +40,12 @@ export default function InsightsScreen() {
   const byCategory = useMemo(() => spendByCategory(subs, categories, 'month', currency, today), [subs, categories, currency, today]);
   const timeline = useMemo(() => monthlyTimeline(subs, today, currency, 12, languageTag), [subs, today, currency, languageTag]);
 
+  // Each currency is shown in its own symbol; the primary one first, the rest underneath (never converted).
+  const primaryMonthly = monthly.find((t) => t.currency === currency)?.amount ?? 0;
+  const primaryYearly = yearly.find((t) => t.currency === currency)?.amount ?? 0;
+  const otherMonthly = monthly.filter((t) => t.currency !== currency && t.count > 0);
+  const otherYearly = yearly.filter((t) => t.currency !== currency && t.count > 0);
+
   const hasData = subs.some((s) => s.status === 'active');
 
   return (
@@ -58,14 +64,24 @@ export default function InsightsScreen() {
               <AppText variant="small" tone="muted">
                 Per month
               </AppText>
-              <AppText variant="h2">{formatMoney(monthly[0]?.amount ?? 0, currency, languageTag)}</AppText>
+              <AppText variant="h2">{formatMoney(primaryMonthly, currency, languageTag)}</AppText>
+              {otherMonthly.map((t) => (
+                <AppText key={t.currency} variant="caption" tone="muted" testID={`insight-monthly-${t.currency}`}>
+                  + {formatMoney(t.amount, t.currency, languageTag)}
+                </AppText>
+              ))}
             </Card>
             <View style={{ width: spacing.md }} />
             <Card style={styles.half} testID="insight-yearly">
               <AppText variant="small" tone="muted">
                 Per year
               </AppText>
-              <AppText variant="h2">{formatMoney(yearly[0]?.amount ?? 0, currency, languageTag)}</AppText>
+              <AppText variant="h2">{formatMoney(primaryYearly, currency, languageTag)}</AppText>
+              {otherYearly.map((t) => (
+                <AppText key={t.currency} variant="caption" tone="muted">
+                  + {formatMoney(t.amount, t.currency, languageTag)}
+                </AppText>
+              ))}
             </Card>
           </View>
           <Card style={{ marginTop: spacing.md }} testID="insight-split">

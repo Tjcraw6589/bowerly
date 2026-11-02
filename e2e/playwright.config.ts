@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4173;
+// Its own port: 4173 is Vite's default and the user's other apps (Holoshelf) test on it, so a
+// reused server there would be the wrong app.
+const PORT = Number(process.env.BOWERLY_E2E_PORT ?? 4327);
 
 export default defineConfig({
   testDir: '.',
@@ -26,7 +28,8 @@ export default defineConfig({
     command: `node scripts/serve-dist.mjs ${PORT}`,
     cwd: '..',
     url: `http://127.0.0.1:${PORT}`,
-    reuseExistingServer: true,
+    // Always start a fresh server: a leftover one could be serving an older build.
+    reuseExistingServer: false,
     timeout: 30_000,
   },
 });

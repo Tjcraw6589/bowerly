@@ -6,6 +6,7 @@ import {
   monthlyTimeline,
   mostExpensive,
   nextEvent,
+  chargesWhileStopped,
   paidToDate,
   spendByCategory,
   sumEvents,
@@ -13,7 +14,7 @@ import {
   upcomingEvents,
 } from '@/lib/stats';
 
-import { makeSub, TODAY } from '../helpers';
+import { makeSub, TODAY, local } from '../helpers';
 
 describe('totalsByCurrency', () => {
   test('sums active paying subscriptions per currency, primary first', () => {
@@ -119,8 +120,29 @@ describe('paidToDate', () => {
   });
 
   test('stops at the cancellation date', () => {
-    const sub = makeSub({ price: 10, firstBillDate: '2026-01-15', status: 'cancelled', cancelledAt: '2026-03-20T10:00:00.000Z' });
+    const sub = makeSub({ price: 10, firstBillDate: '2026-01-15', status: 'cancelled', cancelledAt: local('2026-03-20T10:00') });
     expect(paidToDate(sub, TODAY)).toBe(30);
+  });
+
+  test('stops counting while paused', () => {
+    // Paused 20 Mar: Jan, Feb and Mar 15 were charged; nothing since.
+    const sub = makeSub({ price: 10, firstBillDate: '2026-01-15', status: 'paused', pausedAt: local('2026-03-20T10:00') });
+    expect(paidToDate(sub, TODAY)).toBe(30);
+    // Data saved before pausedAt existed falls back to the last change.
+    const legacy = makeSub({ price: 10, firstBillDate: '2026-01-15', status: 'paused', updatedAt: local('2026-03-20T10:00') });
+    expect(paidToDate(legacy, TODAY)).toBe(30);
+  });
+
+  test('leaves out the charges skipped while paused after resuming', () => {
+    const paused = makeSub({ price: 10, firstBillDate: '2026-01-15', status: 'paused', pausedAt: local('2026-03-20T10:00') });
+    // Resumed 1 Aug: Apr 15 to Jul 15 (4 charges) were skipped.
+    const skipped = chargesWhileStopped(paused, new Date(2026, 7, 1));
+    expect(skipped).toBe(4);
+    const resumed = { ...paused, status: 'active' as const, pausedAt: null, skippedCharges: skipped };
+    // Jan to Oct 15 is 10 charges, minus 4 skipped.
+    expect(paidToDate(resumed, TODAY)).toBe(60);
+    // Resuming on a charge day: that day's charge happens, so it is not skipped.
+    expect(chargesWhileStopped(paused, new Date(2026, 3, 15))).toBe(0);
   });
 });
 

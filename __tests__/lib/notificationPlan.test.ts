@@ -1,7 +1,7 @@
 import { buildNotificationPlan, MAX_PLANNED_NOTIFICATIONS } from '@/lib/notificationPlan';
 import type { Settings } from '@/lib/types';
 
-import { makeSub } from '../helpers';
+import { makeSub, local } from '../helpers';
 
 const now = new Date(2026, 9, 22, 10, 30); // 22 Oct 2026, 10:30
 const settings: Settings = {
@@ -75,7 +75,7 @@ describe('buildNotificationPlan', () => {
 
 describe('bill reminders', () => {
   test('hand-paid bills say "is due" and get an overdue nudge the morning after', () => {
-    const bill = makeSub({ name: 'Rent', kind: 'bill', autopay: false, price: 1200, firstBillDate: '2026-01-25', createdAt: '2026-10-01T00:00:00.000Z' });
+    const bill = makeSub({ name: 'Rent', kind: 'bill', autopay: false, price: 1200, firstBillDate: '2026-01-25', createdAt: local('2026-10-01T00:00') });
     const plan = buildNotificationPlan([bill], settings, now);
     expect(plan[0]).toMatchObject({ title: 'Rent is due tomorrow', body: '$1,200.00 is due on Oct 25.', key: `${bill.id}|bill|2026-10-25` });
     expect(plan[1]).toMatchObject({ title: 'Rent is overdue', key: `${bill.id}|late|2026-10-25` });
@@ -89,5 +89,22 @@ describe('bill reminders', () => {
     const plan = buildNotificationPlan([power], settings, now);
     expect(plan[0]).toMatchObject({ title: 'Power is due tomorrow', body: 'About $80.00 will be paid automatically on Oct 25.' });
     expect(plan.some((p) => p.key.includes('|late|'))).toBe(false);
+  });
+  test('a bill due yesterday still gets its overdue nudge when the plan is rebuilt early this morning', () => {
+    const rent = makeSub({ name: 'Rent', kind: 'bill', autopay: false, price: 1200, firstBillDate: '2026-01-21', createdAt: local('2026-09-01T12:00'), reminderDaysBefore: 1 });
+    const early = new Date(2026, 9, 22, 7, 0); // the morning after the 21st, before the 9:00 reminder hour
+    const plan = buildNotificationPlan([rent], settings, early);
+    const late = plan.find((p) => p.key === `${rent.id}|late|2026-10-21`);
+    expect(late?.fireAt).toEqual(new Date(2026, 9, 22, 9, 0, 0, 0));
+    expect(late?.title).toBe('Rent is overdue');
+    // Once it is marked paid, the nudge goes away.
+    const paid = buildNotificationPlan([{ ...rent, paidThrough: '2026-10-21' }], settings, early);
+    expect(paid.some((p) => p.key.includes('|late|2026-10-21'))).toBe(false);
+  });
+
+  test('no overdue nudge for a due date before the bill was added', () => {
+    const added = makeSub({ kind: 'bill', autopay: false, firstBillDate: '2026-01-21', createdAt: local('2026-10-22T06:00'), reminderDaysBefore: 1 });
+    const plan = buildNotificationPlan([added], settings, new Date(2026, 9, 22, 7, 0));
+    expect(plan.some((p) => p.key.includes('|late|2026-10-21'))).toBe(false);
   });
 });

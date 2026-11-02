@@ -2,7 +2,7 @@ import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testi
 
 import { useStore } from '@/store/useStore';
 
-import { resetStore } from '../helpers';
+import { resetStore, local } from '../helpers';
 
 jest.setTimeout(30_000);
 
@@ -142,5 +142,24 @@ describe('Bowerly end-to-end (router)', () => {
     expect(screen.getByTestId('category-chart')).toBeTruthy();
     expect(screen.getByTestId('timeline-chart')).toBeTruthy();
     expect(screen.getByText('Spotify')).toBeTruthy();
+  });
+  test('insights never shows another currency with the main currency symbol', async () => {
+    resetStore({ onboardingComplete: true });
+    // Main currency is USD, but the only item is in euros.
+    useStore.setState({
+      subscriptions: [
+        {
+          id: 'eur-1', name: 'Miete', kind: 'bill', autopay: true, amountVaries: false, paidThrough: null, price: 900, currency: 'EUR',
+          cycle: { every: 1, unit: 'month' }, firstBillDate: '2026-01-01', categoryId: 'cat_housing', color: '#1F7A5C', emoji: '🏠',
+          notes: '', reminderDaysBefore: 1, status: 'active', trialEndDate: null, cancelledAt: null,
+          createdAt: local('2026-01-01T00:00'), updatedAt: local('2026-01-01T00:00'),
+        },
+      ],
+    });
+    await renderRouter('./src/app', { initialUrl: '/insights' });
+    await screen.findByTestId('insights-screen');
+    expect(screen.getAllByText('$0.00').length).toBeGreaterThan(0);
+    expect(screen.queryByText('$900.00')).toBeNull();
+    expect(screen.getByTestId('insight-monthly-EUR')).toBeTruthy();
   });
 });

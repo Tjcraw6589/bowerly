@@ -52,6 +52,10 @@ export interface Subscription {
   createdAt: string;
   updatedAt: string;
   cancelledAt: string | null;
+  /** When the item was last paused (ISO), or null/absent when it is not paused. */
+  pausedAt?: string | null;
+  /** Charges skipped during past pauses or cancellations, so "paid so far" leaves them out. */
+  skippedCharges?: number;
 }
 
 export type SubscriptionDraft = Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>;

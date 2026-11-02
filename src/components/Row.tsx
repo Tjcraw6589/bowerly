@@ -57,6 +57,7 @@ export function Row({ title, subtitle, value, left, right, onPress, chevron, des
           trackColor={{ true: colors.primary, false: colors.border }}
           thumbColor="#FFFFFF"
           accessibilityLabel={title}
+          style={{ marginLeft: spacing.md }}
           testID={testID ? `${testID}-switch` : undefined}
         />
       ) : null}

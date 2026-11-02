@@ -112,7 +112,8 @@ export default function EditorScreen() {
   const updateSubscription = useStore((s) => s.updateSubscription);
 
   const [draft, setDraft] = useState<SubscriptionDraft>(() => (existing ? toDraft(existing) : defaultDraft(settings, today, kindParam === 'subscription' ? 'subscription' : 'bill')));
-  const [priceText, setPriceText] = useState(() => (existing ? existing.price.toFixed(2) : ''));
+  // Pre-fill in the phone's own style ("9,99" where commas are decimals) so it reads naturally and parses back the same.
+  const [priceText, setPriceText] = useState(() => (existing ? existing.price.toFixed(2).replace('.', decimalSeparator ?? '.') : ''));
   const [cycleKey, setCycleKey] = useState<CycleKey>(() => (existing ? cycleKeyFor(existing.cycle) : 'month'));
   const [everyText, setEveryText] = useState(() => String(draft.cycle.every));
   const [errors, setErrors] = useState<DraftErrors>({});

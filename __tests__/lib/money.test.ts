@@ -55,6 +55,19 @@ describe('parsePriceInput', () => {
     expect(parsePriceInput('1.500', '.')).toBe(1.5);
   });
 
+  test('a price typed with the other mark keeps its decimals (no 100x jump)', () => {
+    // The editor pre-fills existing prices as "9.99"; saving on a comma-decimal phone must keep 9.99.
+    expect(parsePriceInput('9.99', ',')).toBe(9.99);
+    expect(parsePriceInput('1500.00', ',')).toBe(1500);
+    expect(parsePriceInput('0.5', ',')).toBe(0.5);
+    expect(parsePriceInput('9,99', '.')).toBe(9.99);
+    // Groups of three are still thousands in the locale's own style.
+    expect(parsePriceInput('1.500', ',')).toBe(1500);
+    expect(parsePriceInput('1,500', '.')).toBe(1500);
+    expect(parsePriceInput('1.234.567', ',')).toBe(1234567);
+    expect(parsePriceInput('1.2345', ',')).toBeNull();
+  });
+
   test('rejects garbage', () => {
     expect(parsePriceInput('')).toBeNull();
     expect(parsePriceInput('abc')).toBeNull();

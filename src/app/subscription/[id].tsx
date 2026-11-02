@@ -20,7 +20,7 @@ import { findCategory } from '@/lib/categories';
 import { formatDate, parseISODate, relativeDayLabel, upcomingBillDates } from '@/lib/dates';
 import { amountText, eventLabel, nextChargeHeading, paymentMethodLabel } from '@/lib/labels';
 import { cycleLabel, cycleShortLabel, formatMoney, monthlyCost, yearlyCost } from '@/lib/money';
-import { isDatePaid, isManualBill, overdueDates } from '@/lib/payments';
+import { isDatePaid, isManualBill, overdueCount, overdueDates } from '@/lib/payments';
 import { isOnTrial, nextEvent, paidToDate } from '@/lib/stats';
 import { successHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
@@ -62,6 +62,7 @@ export default function SubscriptionDetailScreen() {
   const startDate = parseISODate(sub.firstBillDate);
   const manual = isManualBill(sub);
   const overdue = overdueDates(sub, today);
+  const overdueTotal = overdueCount(sub, today);
   const noun = sub.kind === 'bill' ? 'bill' : 'subscription';
   const paidThroughDate = sub.paidThrough ? parseISODate(sub.paidThrough) : null;
 
@@ -152,9 +153,9 @@ export default function SubscriptionDetailScreen() {
               <AppText variant="h3" tone={event.type === 'overdue' ? 'danger' : 'text'} testID="next-event-label">
                 {event.type === 'overdue' ? eventLabel(event) : relativeDayLabel(event.daysUntil)} · {formatDate(event.date, languageTag)}
               </AppText>
-              {event.type === 'overdue' && overdue.length > 1 ? (
-                <AppText variant="caption" tone="danger">
-                  {overdue.length} due dates unpaid
+              {event.type === 'overdue' && overdueTotal > 1 ? (
+                <AppText variant="caption" tone="danger" testID="overdue-count">
+                  {overdueTotal} due dates unpaid
                 </AppText>
               ) : null}
               {event.type === 'trialEnd' ? (

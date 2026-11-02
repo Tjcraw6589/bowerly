@@ -25,6 +25,37 @@ describe('parseCSV', () => {
     expect(csvEscape('a,b')).toBe('"a,b"');
     expect(csvEscape('say "hi"')).toBe('"say ""hi"""');
   });
+
+  test('csvEscape stops spreadsheets running a name as a formula, and import reads it back', () => {
+    expect(csvEscape('=HYPERLINK("http://x")')).toBe(`"'=HYPERLINK(""http://x"")"`);
+    expect(csvEscape('+1 gym')).toBe("'+1 gym");
+    expect(csvEscape('@home')).toBe("'@home");
+    expect(csvEscape('-5 off')).toBe("'-5 off");
+    expect(csvEscape("It's fine")).toBe("It's fine");
+    expect(csvEscape("'=already")).toBe("''=already");
+    const csv = subscriptionsToCSV([makeSub({ name: '=SUM(A1)', notes: '@note' })], BUILT_IN_CATEGORIES);
+    const back = parseSubscriptionsCSV(csv, BUILT_IN_CATEGORIES, defaults);
+    expect(back.errors).toEqual([]);
+    expect(back.drafts[0]).toMatchObject({ name: '=SUM(A1)', notes: '@note' });
+  });
+});
+
+describe('import checks', () => {
+  test('imported rows get the same checks as the editor', () => {
+    const header = 'name,price,first_bill_date,trial_end_date,notes\r\n';
+    const rows = [
+      `${'x'.repeat(61)},5,2026-01-01,,`,
+      'Big,2000000,2026-01-01,,',
+      'Trial,5,2026-01-01,2026-02-01,',
+      `Notes,5,2026-01-01,,${'n'.repeat(501)}`,
+      'Good,5,2026-01-01,,',
+    ];
+    const result = parseSubscriptionsCSV(header + rows.join('\r\n') + '\r\n', BUILT_IN_CATEGORIES, defaults);
+    expect(result.drafts.map((d) => d.name)).toEqual(['Good']);
+    expect(result.errors.map((e) => e.row)).toEqual([2, 3, 4, 5]);
+    expect(result.errors[2]!.message).toContain('after the trial ends');
+    expect(result.newCategories).toEqual([]);
+  });
 });
 
 describe('export and import round trip', () => {

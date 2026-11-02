@@ -56,15 +56,21 @@ export default function BillsScreen() {
     () => totalsByKind(subs, settings.summaryPeriod, totals[0]?.currency ?? settings.currency, today),
     [subs, settings.summaryPeriod, settings.currency, totals, today],
   );
-  const sections = useMemo(() => {
-    const visible = sortSubscriptions(filterSubscriptions(subs, query, categoryId, kind), settings.sortBy, today);
-    const group = (status: Subscription['status'], title: string) => ({ title, data: visible.filter((s) => s.status === status) });
-    return [group('active', 'Active'), group('paused', 'Paused'), group('cancelled', 'Cancelled')].filter((g) => g.data.length > 0);
-  }, [subs, query, categoryId, kind, settings.sortBy, today]);
   const usedCategories = useMemo(
     () => categories.filter((c) => subs.some((s) => s.categoryId === c.id)),
     [categories, subs],
   );
+  // A filter only applies while its chip is on screen. Deleting the last item of a kind or category
+  // hides the chips, and a hidden filter would otherwise keep the list empty with no way to clear it.
+  const showKindFilter = tally.bills > 0 && tally.subscriptions > 0;
+  const showCategoryFilter = usedCategories.length > 1;
+  const activeKind: KindFilter = showKindFilter ? kind : 'all';
+  const activeCategory = showCategoryFilter && usedCategories.some((c) => c.id === categoryId) ? categoryId : null;
+  const sections = useMemo(() => {
+    const visible = sortSubscriptions(filterSubscriptions(subs, query, activeCategory, activeKind), settings.sortBy, today);
+    const group = (status: Subscription['status'], title: string) => ({ title, data: visible.filter((s) => s.status === status) });
+    return [group('active', 'Active'), group('paused', 'Paused'), group('cancelled', 'Cancelled')].filter((g) => g.data.length > 0);
+  }, [subs, query, activeCategory, activeKind, settings.sortBy, today]);
 
   const onAdd = () => {
     if (canAddActiveSubscription(tally.active, isPro)) router.push('/editor');
@@ -158,21 +164,21 @@ export default function BillsScreen() {
             ) : (
               <View style={{ height: spacing.lg }} />
             )}
-            {tally.bills > 0 && tally.subscriptions > 0 ? (
+            {showKindFilter ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.xs }} testID="kind-filter">
                 {KIND_FILTERS.map((k) => (
-                  <Chip key={k.key} label={k.label} selected={kind === k.key} onPress={() => setKind(k.key)} />
+                  <Chip key={k.key} label={k.label} selected={activeKind === k.key} onPress={() => setKind(k.key)} />
                 ))}
               </ScrollView>
             ) : null}
-            {usedCategories.length > 1 ? (
+            {showCategoryFilter ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.xs }}>
-                <Chip label="All" selected={categoryId === null} onPress={() => setCategoryId(null)} />
+                <Chip label="All" selected={activeCategory === null} onPress={() => setCategoryId(null)} />
                 {usedCategories.map((c) => (
                   <Chip
                     key={c.id}
                     label={`${c.emoji} ${c.name}`}
-                    selected={categoryId === c.id}
+                    selected={activeCategory === c.id}
                     color={c.color}
                     onPress={() => setCategoryId(categoryId === c.id ? null : c.id)}
                   />

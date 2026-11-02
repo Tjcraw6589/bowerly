@@ -203,16 +203,41 @@ export function totalsByKind(subs: readonly Subscription[], period: SummaryPerio
   return out;
 }
 
-/** Total paid so far: bills on or before today (or the cancellation date), times the price. */
+/** The day an item stopped being charged: when it was paused or cancelled. Null while active. */
+export function stoppedOn(sub: Subscription): Date | null {
+  if (sub.status === 'active') return null;
+  const stamps = [sub.pausedAt, sub.cancelledAt, sub.status === 'paused' && !sub.pausedAt ? sub.updatedAt : null]
+    .filter((s): s is string => typeof s === 'string' && s.length > 0)
+    .map((s) => new Date(s))
+    .filter((d) => !Number.isNaN(d.getTime()));
+  if (stamps.length === 0) return null;
+  return startOfDay(new Date(Math.min(...stamps.map((d) => d.getTime()))));
+}
+
+/**
+ * Total paid so far: bills on or before today, or before the day it was paused or cancelled,
+ * minus charges skipped during earlier pauses, times the price.
+ */
 export function paidToDate(sub: Subscription, today: Date): number {
   const first = parseISODate(sub.firstBillDate);
   if (!first) return 0;
   let end = startOfDay(today);
-  if (sub.cancelledAt) {
-    const cancelled = startOfDay(new Date(sub.cancelledAt));
-    if (!Number.isNaN(cancelled.getTime()) && cancelled.getTime() < end.getTime()) end = cancelled;
-  }
-  return roundMoney(billsOnOrBefore(first, sub.cycle, end) * sub.price);
+  const stopped = stoppedOn(sub);
+  // A charge on the day it was stopped already happened, so the stop day itself still counts.
+  if (stopped && stopped.getTime() < end.getTime()) end = stopped;
+  const charges = billsOnOrBefore(first, sub.cycle, end) - (sub.skippedCharges ?? 0);
+  return roundMoney(Math.max(0, charges) * sub.price);
+}
+
+/** Charges that fell between stopping (pause or cancel) and resuming today. */
+export function chargesWhileStopped(sub: Subscription, resumeDay: Date): number {
+  const first = parseISODate(sub.firstBillDate);
+  const stopped = stoppedOn(sub);
+  if (!first || !stopped) return 0;
+  // Charges after the stop day and before the resume day (a charge due on the resume day is paid).
+  const before = addDays(startOfDay(resumeDay), -1);
+  if (before.getTime() <= stopped.getTime()) return 0;
+  return billsOnOrBefore(first, sub.cycle, before) - billsOnOrBefore(first, sub.cycle, stopped);
 }
 
 export interface TimelinePoint {

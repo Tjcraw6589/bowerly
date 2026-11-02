@@ -66,9 +66,17 @@ export function parsePriceInput(raw: string, decimalSeparator?: '.' | ','): numb
   if (!cleaned) return null;
 
   let normalized: string;
-  if (decimalSeparator) {
-    const grouping = decimalSeparator === '.' ? ',' : '.';
-    normalized = cleaned.split(grouping).join('').replace(decimalSeparator, '.');
+  const other = decimalSeparator === '.' ? ',' : '.';
+  if (decimalSeparator && cleaned.includes(decimalSeparator)) {
+    normalized = cleaned.split(other).join('').replace(decimalSeparator, '.');
+  } else if (decimalSeparator && cleaned.includes(other)) {
+    // Only the other mark appears. Groups of three ("1.500" on a comma phone) are thousands; a short
+    // tail ("9.99" on a comma phone, as the editor pre-fills it) is a decimal point, not 999.
+    const parts = cleaned.split(other);
+    const tail = parts[parts.length - 1] ?? '';
+    if (isGrouped(parts)) normalized = parts.join('');
+    else if (parts.length === 2 && tail.length <= 2) normalized = parts.join('.');
+    else return null;
   } else {
     const lastComma = cleaned.lastIndexOf(',');
     const lastDot = cleaned.lastIndexOf('.');
