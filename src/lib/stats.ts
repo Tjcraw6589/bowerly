@@ -4,9 +4,9 @@ import {
   billDatesInRange,
   billsOnOrBefore,
   daysUntil,
+  isOneTime,
   monthKey,
   monthLabel,
-  nextBillDate,
   parseISODate,
   startOfDay,
   startOfMonth,
@@ -26,9 +26,12 @@ export function isActive(sub: Subscription): boolean {
   return sub.status === 'active';
 }
 
-/** Active subscriptions that are currently being charged (not on a free trial). */
+/**
+ * Active items that are currently being charged (not on a free trial). One time payments are left
+ * out: they are not a monthly or yearly cost. They still count in upcoming totals and the timeline.
+ */
 export function payingSubs(subs: readonly Subscription[], today: Date): Subscription[] {
-  return subs.filter((s) => isActive(s) && !isOnTrial(s, today));
+  return subs.filter((s) => isActive(s) && !isOnTrial(s, today) && !isOneTime(s.cycle));
 }
 
 export interface CurrencyTotal {
@@ -133,7 +136,9 @@ export function nextEvent(sub: Subscription, today: Date): UpcomingEvent | null 
     const end = parseISODate(sub.trialEndDate ?? '');
     if (end) return { subscription: sub, type: 'trialEnd', date: end, daysUntil: daysUntil(end, today) };
   }
-  const date = nextUnpaidDue(sub, today) ?? nextBillDate(first, sub.cycle, today);
+  // Null when a one time payment is done: nothing is next.
+  const date = nextUnpaidDue(sub, today);
+  if (!date) return null;
   return { subscription: sub, type: 'bill', date, daysUntil: daysUntil(date, today) };
 }
 

@@ -22,7 +22,7 @@ import { useToday } from '@/hooks/useToday';
 import { CATEGORY_COLORS, findCategory, OTHER_CATEGORY_ID } from '@/lib/categories';
 import { CURRENCIES, currencyInfo } from '@/lib/currencies';
 import { addDays, formatDate, nextBillDate, parseISODate, toISODate } from '@/lib/dates';
-import { CYCLE_PRESETS, cycleLabel, cyclesEqual, formatMoney, parsePriceInput } from '@/lib/money';
+import { cycleLabel, cyclesEqual, formatMoney, ONE_TIME, parsePriceInput } from '@/lib/money';
 import { AVATAR_EMOJIS, searchPresets, type ServicePreset } from '@/lib/presets';
 import type { BillingCycle, CycleUnit, ItemKind, Settings, Subscription, SubscriptionDraft } from '@/lib/types';
 import { type DraftErrors, hasErrors, MAX_NAME_LENGTH, MAX_NOTES_LENGTH, validateDraft } from '@/lib/validation';
@@ -37,13 +37,25 @@ const KIND_OPTIONS = [
 ] as const;
 
 const CYCLE_KEYS = [
+  { key: 'once', label: 'One time' },
   { key: 'week', label: 'Weekly' },
+  { key: 'biweekly', label: 'Every 2 weeks' },
   { key: 'month', label: 'Monthly' },
   { key: 'quarter', label: 'Quarterly' },
   { key: 'year', label: 'Yearly' },
   { key: 'custom', label: 'Custom' },
 ] as const;
 type CycleKey = (typeof CYCLE_KEYS)[number]['key'];
+type PresetKey = Exclude<CycleKey, 'custom'>;
+
+const PRESET_CYCLES: Record<PresetKey, BillingCycle> = {
+  once: ONE_TIME,
+  week: { every: 1, unit: 'week' },
+  biweekly: { every: 2, unit: 'week' },
+  month: { every: 1, unit: 'month' },
+  quarter: { every: 3, unit: 'month' },
+  year: { every: 1, unit: 'year' },
+};
 
 const UNIT_OPTIONS: readonly { key: CycleUnit; label: string }[] = [
   { key: 'day', label: 'days' },
@@ -61,15 +73,12 @@ const REMINDER_OPTIONS = [
 ] as const;
 
 function cycleKeyFor(cycle: BillingCycle): CycleKey {
-  if (cyclesEqual(cycle, { every: 1, unit: 'week' })) return 'week';
-  if (cyclesEqual(cycle, { every: 1, unit: 'month' })) return 'month';
-  if (cyclesEqual(cycle, { every: 3, unit: 'month' })) return 'quarter';
-  if (cyclesEqual(cycle, { every: 1, unit: 'year' })) return 'year';
-  return 'custom';
+  const keys = Object.keys(PRESET_CYCLES) as PresetKey[];
+  return keys.find((k) => cyclesEqual(PRESET_CYCLES[k], cycle)) ?? 'custom';
 }
 
-function cycleForKey(key: Exclude<CycleKey, 'custom'>): BillingCycle {
-  return { week: CYCLE_PRESETS[0]!.cycle, month: CYCLE_PRESETS[1]!.cycle, quarter: CYCLE_PRESETS[2]!.cycle, year: CYCLE_PRESETS[3]!.cycle }[key];
+function cycleForKey(key: PresetKey): BillingCycle {
+  return PRESET_CYCLES[key];
 }
 
 function defaultDraft(settings: Settings, today: Date, kind: ItemKind): SubscriptionDraft {
@@ -159,6 +168,24 @@ export default function EditorScreen() {
 
   const isBill = draft.kind === 'bill';
   const noun = isBill ? 'bill' : 'subscription';
+  const oneTime = cycleKey === 'once';
+  const dateTitle = oneTime
+    ? isBill
+      ? 'Due date'
+      : 'Payment date'
+    : isBill
+      ? 'First due date'
+      : draft.trialEndDate !== null
+        ? 'First paid bill'
+        : 'First bill date';
+
+  const chooseCycle = (key: CycleKey) => {
+    if (key === cycleKey) return;
+    setCycleKey(key);
+    if (key !== 'custom') patch({ cycle: cycleForKey(key) });
+    // Custom repeats in days, weeks, months or years; a one time payment has none of those.
+    else if (draft.cycle.unit === 'once') patch({ cycle: { every: draft.cycle.every, unit: 'month' } });
+  };
 
   const setKind = (kind: ItemKind) => {
     setDraft((d) => ({
@@ -197,10 +224,11 @@ export default function EditorScreen() {
       price: priceValue ?? Number.NaN,
       cycle: currentCycle,
       notes: draft.notes.slice(0, MAX_NOTES_LENGTH),
-      // Only bills paid by hand keep a paid-through date; only subscriptions have trials.
+      // Only bills paid by hand keep a paid-through date; only repeating subscriptions have trials.
       autopay: isBill ? draft.autopay : true,
+      amountVaries: oneTime ? false : draft.amountVaries,
       paidThrough: isBill && !draft.autopay ? draft.paidThrough : null,
-      trialEndDate: isBill ? null : draft.trialEndDate,
+      trialEndDate: isBill || oneTime ? null : draft.trialEndDate,
     };
     const errs = validateDraft(candidate);
     if (cycleKey === 'custom' && (!Number.isInteger(Number(everyText)) || Number(everyText) < 1)) errs.cycleEvery = 'Repeat every 1 to 365 units.';
@@ -279,7 +307,7 @@ export default function EditorScreen() {
         </View>
       </View>
       {suggestions.length > 0 ? (
-        <View style={[styles.suggestions, { marginTop: -spacing.sm, marginBottom: spacing.md }]}>
+        <View style={[styles.wrapRow, { marginTop: -spacing.sm, marginBottom: spacing.md }]}>
           {suggestions.map((p) => (
             <Chip key={p.name} label={`${p.emoji} ${p.name}`} onPress={() => applyPreset(p)} testID={`preset-${p.name}`} />
           ))}
@@ -287,7 +315,7 @@ export default function EditorScreen() {
       ) : null}
 
       <TextField
-        label={draft.amountVaries ? 'Typical amount' : 'Amount'}
+        label={draft.amountVaries && !oneTime ? 'Typical amount' : 'Amount'}
         placeholder="0.00"
         value={priceText}
         onChangeText={(t) => {
@@ -316,17 +344,13 @@ export default function EditorScreen() {
       <AppText variant="small" tone="muted" style={{ marginBottom: spacing.xs }}>
         How often
       </AppText>
-      <SegmentedControl
-        options={CYCLE_KEYS}
-        value={cycleKey}
-        onChange={(key) => {
-          setCycleKey(key);
-          if (key !== 'custom') patch({ cycle: cycleForKey(key) });
-        }}
-        testID="cycle"
-      />
+      <View style={styles.wrapRow} testID="cycle">
+        {CYCLE_KEYS.map((c) => (
+          <Chip key={c.key} label={c.label} selected={cycleKey === c.key} onPress={() => chooseCycle(c.key)} testID={`cycle-${c.key}`} />
+        ))}
+      </View>
       {cycleKey === 'custom' ? (
-        <View style={[styles.customRow, { marginTop: spacing.md }]}>
+        <View style={[styles.customRow, { marginTop: spacing.xs }]}>
           <AppText variant="body" style={{ marginRight: spacing.sm }}>
             Every
           </AppText>
@@ -349,7 +373,7 @@ export default function EditorScreen() {
         </View>
       ) : null}
       {priceValue !== null && priceValue > 0 ? (
-        <AppText variant="caption" tone="muted" style={{ marginTop: spacing.sm }}>
+        <AppText variant="caption" tone="muted" style={{ marginTop: cycleKey === 'custom' ? spacing.sm : 0 }}>
           {formatMoney(priceValue, draft.currency, languageTag)} {cycleLabel(currentCycle).toLowerCase()}
         </AppText>
       ) : null}
@@ -367,15 +391,17 @@ export default function EditorScreen() {
               toggle={{ value: draft.autopay, onValueChange: (autopay) => patch({ autopay }) }}
               testID="autopay-row"
             />
-            <Row
-              title="Amount changes each time"
-              subtitle="For power, water or a credit card. Enter a typical amount."
-              toggle={{ value: draft.amountVaries, onValueChange: (amountVaries) => patch({ amountVaries }) }}
-              testID="varies-row"
-            />
+            {!oneTime ? (
+              <Row
+                title="Amount changes each time"
+                subtitle="For power, water or a credit card. Enter a typical amount."
+                toggle={{ value: draft.amountVaries, onValueChange: (amountVaries) => patch({ amountVaries }) }}
+                testID="varies-row"
+              />
+            ) : null}
           </>
         ) : null}
-        {!isBill ? (
+        {!isBill && !oneTime ? (
         <Row
           title="Free trial"
           subtitle={trialDate ? `Ends ${formatDate(trialDate, languageTag)}` : 'Remind me before a trial turns into a paid plan'}
@@ -383,14 +409,14 @@ export default function EditorScreen() {
           testID="trial-row"
         />
         ) : null}
-        {!isBill && draft.trialEndDate !== null ? (
+        {!isBill && !oneTime && draft.trialEndDate !== null ? (
           <Row title="Trial ends" value={trialDate ? formatDate(trialDate, languageTag) : ''} onPress={() => setSheet('trialDate')} testID="trial-date-row" />
         ) : null}
         <Row
-          title={isBill ? 'First due date' : draft.trialEndDate !== null ? 'First paid bill' : 'First bill date'}
+          title={dateTitle}
           subtitle={
             errors.firstBillDate ??
-            (nextRenewal.getTime() !== firstDate.getTime()
+            (!oneTime && nextRenewal.getTime() !== firstDate.getTime()
               ? `${isBill ? 'Next due' : 'Next renewal'}: ${formatDate(nextRenewal, languageTag)}`
               : undefined)
           }
@@ -475,7 +501,7 @@ export default function EditorScreen() {
       <DateSheet
         visible={sheet === 'firstDate'}
         onClose={() => setSheet(null)}
-        title={isBill ? 'First due date' : draft.trialEndDate !== null ? 'First paid bill' : 'First bill date'}
+        title={dateTitle}
         value={firstDate}
         onChange={(d) => {
           patch({ firstBillDate: toISODate(d) });
@@ -502,7 +528,7 @@ const styles = StyleSheet.create({
   footer: { paddingTop: 8 },
   avatarRow: { flexDirection: 'row', alignItems: 'flex-start' },
   editBadge: { position: 'absolute', right: -2, bottom: -2, width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
-  suggestions: { flexDirection: 'row', flexWrap: 'wrap' },
+  wrapRow: { flexDirection: 'row', flexWrap: 'wrap' },
   currencyPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, gap: 2 },
   customRow: { flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap' },
   unitChips: { flexDirection: 'row', flexWrap: 'wrap', flex: 1, paddingTop: 6 },

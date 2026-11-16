@@ -64,12 +64,25 @@ export function daysBetween(a: Date, b: Date): number {
   return Math.round((utcB - utcA) / 86_400_000);
 }
 
-const APPROX_DAYS: Record<CycleUnit, number> = {
+const APPROX_DAYS: Record<Exclude<CycleUnit, 'once'>, number> = {
   day: 1,
   week: 7,
   month: 365.25 / 12,
   year: 365.25,
 };
+
+/** A one time payment: one date that never repeats. */
+export function isOneTime(cycle: BillingCycle): boolean {
+  return cycle.unit === 'once';
+}
+
+/**
+ * What a one time payment returns for any bill after its only one. It is later than any real date,
+ * so every loop over bill dates stops there, and callers check isOneTime before showing a date.
+ */
+function afterLastBill(): Date {
+  return new Date(9999, 11, 31);
+}
 
 /**
  * The n-th bill date (0 = the first bill) for an anchor date and cycle.
@@ -87,6 +100,8 @@ export function nthBillDate(first: Date, cycle: BillingCycle, n: number): Date {
       return addMonths(first, steps);
     case 'year':
       return addMonths(first, steps * 12);
+    case 'once':
+      return n === 0 ? addDays(first, 0) : afterLastBill();
   }
 }
 
@@ -95,6 +110,7 @@ export function nextBillIndex(first: Date, cycle: BillingCycle, today: Date): nu
   const t = startOfDay(today).getTime();
   const f = startOfDay(first);
   if (f.getTime() >= t) return 0;
+  if (cycle.unit === 'once') return 1;
   const approx = daysBetween(f, startOfDay(today)) / (APPROX_DAYS[cycle.unit] * cycle.every);
   let n = Math.max(0, Math.floor(approx) - 1);
   while (nthBillDate(f, cycle, n).getTime() < t) n++;
@@ -110,6 +126,7 @@ export function nextBillDate(first: Date, cycle: BillingCycle, today: Date): Dat
 export function upcomingBillDates(first: Date, cycle: BillingCycle, today: Date, count: number): Date[] {
   const f = startOfDay(first);
   const start = nextBillIndex(f, cycle, today);
+  if (isOneTime(cycle)) return start === 0 && count > 0 ? [f] : [];
   const out: Date[] = [];
   for (let i = 0; i < count; i++) out.push(nthBillDate(f, cycle, start + i));
   return out;
@@ -122,6 +139,7 @@ export function billDatesInRange(first: Date, cycle: BillingCycle, today: Date, 
   let n = nextBillIndex(f, cycle, today);
   const out: Date[] = [];
   while (out.length < cap) {
+    if (isOneTime(cycle) && n > 0) break;
     const d = nthBillDate(f, cycle, n);
     if (d.getTime() > e) break;
     out.push(d);

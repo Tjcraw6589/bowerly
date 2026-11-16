@@ -5,6 +5,8 @@ const CYCLES_PER_YEAR: Record<CycleUnit, number> = {
   week: 365.25 / 7,
   month: 12,
   year: 1,
+  // A one time payment is not a monthly or yearly cost, so it adds nothing to those totals.
+  once: 0,
 };
 
 export function yearlyCost(price: number, cycle: BillingCycle): number {
@@ -108,6 +110,7 @@ export function parsePriceInput(raw: string, decimalSeparator?: '.' | ','): numb
 
 export function cycleLabel(cycle: BillingCycle): string {
   const { every, unit } = cycle;
+  if (unit === 'once') return 'One time';
   if (every === 1) {
     return { day: 'Daily', week: 'Weekly', month: 'Monthly', year: 'Yearly' }[unit];
   }
@@ -119,14 +122,19 @@ export function cycleLabel(cycle: BillingCycle): string {
 
 export function cycleShortLabel(cycle: BillingCycle): string {
   const { every, unit } = cycle;
+  // Read after an amount, like "/mo": "$40 once".
+  if (unit === 'once') return ' once';
   if (every === 1) return { day: '/day', week: '/wk', month: '/mo', year: '/yr' }[unit];
   if (unit === 'month' && every === 3) return '/qtr';
   const abbr = { day: 'd', week: 'wk', month: 'mo', year: 'yr' }[unit];
   return `/${every} ${abbr}`;
 }
 
+export const ONE_TIME: BillingCycle = { every: 1, unit: 'once' };
+
 export const CYCLE_PRESETS: readonly { label: string; cycle: BillingCycle }[] = [
   { label: 'Weekly', cycle: { every: 1, unit: 'week' } },
+  { label: 'Every 2 weeks', cycle: { every: 2, unit: 'week' } },
   { label: 'Monthly', cycle: { every: 1, unit: 'month' } },
   { label: 'Quarterly', cycle: { every: 3, unit: 'month' } },
   { label: 'Yearly', cycle: { every: 1, unit: 'year' } },

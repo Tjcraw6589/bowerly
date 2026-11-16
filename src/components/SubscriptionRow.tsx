@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { formatShortDate } from '@/lib/dates';
 import { amountText, eventLabel } from '@/lib/labels';
 import { cycleShortLabel } from '@/lib/money';
+import { oneTimePaidOn } from '@/lib/payments';
 import { nextEvent } from '@/lib/stats';
 import type { Category, Subscription } from '@/lib/types';
 import { useTheme } from '@/theme/useTheme';
@@ -25,6 +26,8 @@ interface SubscriptionRowProps {
 export function SubscriptionRow({ subscription: s, category, today, locale, onPress, last }: SubscriptionRowProps) {
   const { colors, spacing } = useTheme();
   const event = nextEvent(s, today);
+  // A one time payment that is done has nothing next: it shows when it was paid instead.
+  const paidOn = s.status === 'active' ? oneTimePaidOn(s, today) : null;
   const overdue = event?.type === 'overdue' && s.status === 'active';
   const nextLabel =
     s.status === 'paused'
@@ -33,7 +36,9 @@ export function SubscriptionRow({ subscription: s, category, today, locale, onPr
         ? 'Cancelled'
         : event
           ? `${eventLabel(event)} · ${formatShortDate(event.date, locale)}`
-          : '';
+          : paidOn
+            ? `Paid · ${formatShortDate(paidOn, locale)}`
+            : '';
   const soon = event !== null && s.status === 'active' && !overdue && event.daysUntil <= 3;
   const amount = amountText(s, locale);
 
@@ -51,7 +56,7 @@ export function SubscriptionRow({ subscription: s, category, today, locale, onPr
           paddingVertical: spacing.md,
           paddingHorizontal: spacing.lg,
           backgroundColor: pressed ? colors.surfaceAlt : 'transparent',
-          opacity: s.status === 'active' ? 1 : 0.7,
+          opacity: s.status === 'active' && !paidOn ? 1 : 0.7,
         },
         !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
       ]}

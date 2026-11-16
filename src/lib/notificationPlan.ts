@@ -1,4 +1,4 @@
-import { addDays, billDatesInRange, formatShortDate, parseISODate, startOfDay, toISODate } from './dates';
+import { addDays, billDatesInRange, formatShortDate, isOneTime, parseISODate, startOfDay, toISODate } from './dates';
 import { cycleShortLabel, formatMoney } from './money';
 import { isDatePaid, isManualBill, trackingStart } from './payments';
 import { isOnTrial } from './stats';
@@ -35,7 +35,8 @@ function amountLabel(item: Subscription, locale: string): string {
 
 function dueTitle(item: Subscription, daysBefore: number, date: Date, locale: string): string {
   const when = whenLabel(daysBefore, date, locale);
-  return item.kind === 'bill' ? `${item.name} is due ${when}` : `${item.name} renews ${when}`;
+  if (item.kind === 'bill') return `${item.name} is due ${when}`;
+  return isOneTime(item.cycle) ? `${item.name} is charged ${when}` : `${item.name} renews ${when}`;
 }
 
 function dueBody(item: Subscription, daysBefore: number, date: Date, locale: string): string {

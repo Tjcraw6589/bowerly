@@ -1,4 +1,4 @@
-import { addDays, daysBetween, nextBillIndex, nthBillDate, parseISODate, startOfDay, toISODate } from './dates';
+import { addDays, daysBetween, isOneTime, nextBillIndex, nthBillDate, parseISODate, startOfDay, toISODate } from './dates';
 import type { Subscription } from './types';
 
 /** Overdue lists are capped so a years-old untouched bill cannot produce thousands of rows. */
@@ -61,18 +61,30 @@ export function overdueCount(item: Subscription, today: Date): number {
 /**
  * The next due date that still needs paying: the oldest overdue date if any, otherwise the first
  * upcoming due date after anything already marked paid. For subscriptions and autopaid bills this
- * is simply the next charge on or after today.
+ * is simply the next charge on or after today. Null once a one time payment is done: marked paid,
+ * or (when nobody marks it) its date has passed.
  */
 export function nextUnpaidDue(item: Subscription, today: Date): Date | null {
   const first = parseISODate(item.firstBillDate);
   if (!first) return null;
   const t = startOfDay(today);
   const upcoming = nextBillIndex(first, item.cycle, t);
-  if (!isManualBill(item)) return nthBillDate(first, item.cycle, upcoming);
-  const unpaid = firstUnpaidIndex(item, first);
-  // A paused or cancelled bill owes nothing from the past; only active ones can be overdue.
-  const n = item.status === 'active' ? unpaid : Math.max(unpaid, upcoming);
+  let n = upcoming;
+  if (isManualBill(item)) {
+    const unpaid = firstUnpaidIndex(item, first);
+    // A paused or cancelled bill owes nothing from the past; only active ones can be overdue.
+    n = item.status === 'active' ? unpaid : Math.max(unpaid, upcoming);
+  }
+  if (isOneTime(item.cycle) && n > 0) return null;
   return nthBillDate(first, item.cycle, n);
+}
+
+/** The date of a one time payment that is done (marked paid, or already charged); null otherwise. */
+export function oneTimePaidOn(item: Subscription, today: Date): Date | null {
+  if (!isOneTime(item.cycle)) return null;
+  const date = parseISODate(item.firstBillDate);
+  if (!date || nextUnpaidDue(item, today) !== null) return null;
+  return date;
 }
 
 /** Marks the next unpaid due date as paid and returns the new paidThrough value. */
@@ -106,6 +118,9 @@ export function paidThroughAfterReschedule(before: Subscription, after: Subscrip
   if (!isManualBill(after) || !before.paidThrough) return after.paidThrough;
   const sameSchedule = before.firstBillDate === after.firstBillDate && before.cycle.every === after.cycle.every && before.cycle.unit === after.cycle.unit;
   if (sameSchedule || after.paidThrough !== before.paidThrough) return after.paidThrough;
+  // A one time payment that was paid stays paid when only its date moves. A repeating bill turned
+  // into a one time payment starts unpaid: its earlier payments were for other dates.
+  if (isOneTime(after.cycle)) return isOneTime(before.cycle) ? after.firstBillDate : null;
   const oldFirst = parseISODate(before.firstBillDate);
   const newFirst = parseISODate(after.firstBillDate);
   const paid = paidThroughDate(before);

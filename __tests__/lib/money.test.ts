@@ -105,6 +105,7 @@ describe('cycle labels', () => {
 
   test('preset detection', () => {
     expect(isPresetCycle({ every: 1, unit: 'week' })).toBe(true);
-    expect(isPresetCycle({ every: 2, unit: 'week' })).toBe(false);
+    expect(isPresetCycle({ every: 2, unit: 'week' })).toBe(true);
+    expect(isPresetCycle({ every: 3, unit: 'week' })).toBe(false);
   });
 });

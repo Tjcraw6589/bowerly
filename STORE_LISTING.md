@@ -84,6 +84,11 @@ Bowerly is a tracker: it does not pay bills or move money. "Paid" and "overdue" 
 Made by one independent developer. Questions and ideas: tyjcraw@gmail.com
 ```
 
+**What's New (1.0.1)** (134 characters)
+```
+New: add a one time payment and get a reminder before it's due. You can also pick Every 2 weeks for anything you pay every other week.
+```
+
 **What's New (1.0.0)** (163 characters)
 ```
 First release. Track bills and subscriptions, mark bills paid, see what's overdue, and get reminders before due dates and trial ends. Private, offline, no account.

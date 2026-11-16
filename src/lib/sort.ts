@@ -1,3 +1,4 @@
+import { isOneTime } from './dates';
 import { monthlyCost } from './money';
 import { nextEvent } from './stats';
 import type { KindFilter, SortKey, Subscription } from './types';
@@ -8,6 +9,11 @@ export const SORT_OPTIONS: readonly { key: SortKey; label: string }[] = [
   { key: 'priceDesc', label: 'Price: high to low' },
   { key: 'priceAsc', label: 'Price: low to high' },
 ];
+
+/** What "price" sorts by: the monthly cost, or the whole amount of a one time payment. */
+function sortCost(s: Subscription): number {
+  return isOneTime(s.cycle) ? s.price : monthlyCost(s.price, s.cycle);
+}
 
 /** Active first (soonest renewal first within), then paused, then cancelled. */
 export function sortSubscriptions(subs: readonly Subscription[], key: SortKey, today: Date): Subscription[] {
@@ -24,9 +30,9 @@ export function sortSubscriptions(subs: readonly Subscription[], key: SortKey, t
       case 'name':
         return a.name.localeCompare(b.name);
       case 'priceDesc':
-        return monthlyCost(b.price, b.cycle) - monthlyCost(a.price, a.cycle) || a.name.localeCompare(b.name);
+        return sortCost(b) - sortCost(a) || a.name.localeCompare(b.name);
       case 'priceAsc':
-        return monthlyCost(a.price, a.cycle) - monthlyCost(b.price, b.cycle) || a.name.localeCompare(b.name);
+        return sortCost(a) - sortCost(b) || a.name.localeCompare(b.name);
       case 'nextBill':
       default:
         return (nextTime.get(a.id) ?? 0) - (nextTime.get(b.id) ?? 0) || a.name.localeCompare(b.name);

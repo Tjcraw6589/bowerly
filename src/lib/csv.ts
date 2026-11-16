@@ -137,7 +137,7 @@ export interface ImportResult {
   errors: ImportError[];
 }
 
-const UNITS: readonly CycleUnit[] = ['day', 'week', 'month', 'year'];
+const UNITS: readonly CycleUnit[] = ['day', 'week', 'month', 'year', 'once'];
 const STATUSES: readonly SubscriptionStatus[] = ['active', 'paused', 'cancelled'];
 
 function normaliseHeader(h: string): string {
@@ -164,6 +164,7 @@ function unitFromText(text: string): CycleUnit | null {
   const t = text.trim().toLowerCase();
   if (!t) return 'month';
   const singular = t.endsWith('s') ? t.slice(0, -1) : t;
+  if (['one time', 'one-time', 'onetime', 'one_time', 'one off', 'one-off'].includes(t)) return 'once';
   if (singular === 'daily') return 'day';
   if (singular === 'weekly') return 'week';
   if (singular === 'monthly') return 'month';
@@ -220,9 +221,11 @@ export function parseSubscriptionsCSV(
     }
     const unit = unitFromText(cell(row, 'cycle_unit'));
     if (!unit) {
-      errors.push({ row: rowNumber, message: `Invalid cycle unit for "${name}" (use day, week, month or year).` });
+      errors.push({ row: rowNumber, message: `Invalid cycle unit for "${name}" (use day, week, month, year or once).` });
       continue;
     }
+    // A one time payment happens once, whatever the count column says.
+    const cycle = { every: unit === 'once' ? 1 : every, unit };
     const firstBillDate = cell(row, 'first_bill_date') || toISODate(defaults.today);
     if (!isValidISODate(firstBillDate)) {
       errors.push({ row: rowNumber, message: `Invalid first bill date for "${name}" (use yyyy-mm-dd).` });
@@ -280,7 +283,7 @@ export function parseSubscriptionsCSV(
       paidThrough: null,
       price,
       currency,
-      cycle: { every, unit },
+      cycle,
       firstBillDate,
       categoryId: OTHER_CATEGORY_ID,
       color: '#64748B',
@@ -328,7 +331,7 @@ export function parseSubscriptionsCSV(
       paidThrough: kind === 'bill' && !autopay ? paidThroughText || null : null,
       price,
       currency,
-      cycle: { every, unit },
+      cycle,
       firstBillDate,
       categoryId: category.id,
       color,

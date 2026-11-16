@@ -1,4 +1,4 @@
-import { relativeDayLabel } from './dates';
+import { isOneTime, relativeDayLabel } from './dates';
 import { formatMoney } from './money';
 import type { ItemKind, Subscription, UpcomingEvent } from './types';
 
@@ -13,9 +13,9 @@ export function amountText(item: Subscription, locale: string, amount = item.pri
   return item.amountVaries ? `~${money}` : money;
 }
 
-/** How a charge happens: "Renews" (subscription), "Autopays" (autopaid bill) or "Due" (paid by hand). */
+/** How a charge happens: "Renews" (subscription), "Charges" (one time), "Autopays" (autopaid bill) or "Due" (paid by hand). */
 export function chargeVerb(item: Subscription): string {
-  if (item.kind === 'subscription') return 'Renews';
+  if (item.kind === 'subscription') return isOneTime(item.cycle) ? 'Charges' : 'Renews';
   return item.autopay ? 'Autopays' : 'Due';
 }
 
@@ -29,14 +29,15 @@ export function eventLabel(event: UpcomingEvent): string {
   return `${verb} ${relativeDayLabel(event.daysUntil).toLowerCase()}`;
 }
 
-/** "Due on", "Renews on" or "Autopays on", for detail screens. */
+/** "Next due", "Next renewal" or "Next autopay" for detail screens; a one time payment has no "next". */
 export function nextChargeHeading(item: Subscription): string {
+  if (isOneTime(item.cycle)) return item.kind === 'subscription' ? 'Charge' : item.autopay ? 'Autopay' : 'Due';
   if (item.kind === 'subscription') return 'Next renewal';
   return item.autopay ? 'Next autopay' : 'Next due';
 }
 
 /** "How it's paid": shown on bills. */
 export function paymentMethodLabel(item: Subscription): string {
-  if (item.kind === 'subscription') return 'Renews automatically';
+  if (item.kind === 'subscription') return isOneTime(item.cycle) ? 'Charged automatically' : 'Renews automatically';
   return item.autopay ? 'Autopay' : 'Paid by hand';
 }

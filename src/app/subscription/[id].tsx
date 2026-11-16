@@ -17,10 +17,10 @@ import { StatusPill } from '@/components/StatusPill';
 import { useLocale } from '@/hooks/useLocale';
 import { useToday } from '@/hooks/useToday';
 import { findCategory } from '@/lib/categories';
-import { formatDate, parseISODate, relativeDayLabel, upcomingBillDates } from '@/lib/dates';
+import { formatDate, isOneTime, parseISODate, relativeDayLabel, upcomingBillDates } from '@/lib/dates';
 import { amountText, eventLabel, nextChargeHeading, paymentMethodLabel } from '@/lib/labels';
 import { cycleLabel, cycleShortLabel, formatMoney, monthlyCost, yearlyCost } from '@/lib/money';
-import { isDatePaid, isManualBill, overdueCount, overdueDates } from '@/lib/payments';
+import { isDatePaid, isManualBill, oneTimePaidOn, overdueCount, overdueDates } from '@/lib/payments';
 import { isOnTrial, nextEvent, paidToDate } from '@/lib/stats';
 import { successHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
@@ -65,6 +65,8 @@ export default function SubscriptionDetailScreen() {
   const overdueTotal = overdueCount(sub, today);
   const noun = sub.kind === 'bill' ? 'bill' : 'subscription';
   const paidThroughDate = sub.paidThrough ? parseISODate(sub.paidThrough) : null;
+  const oneTime = isOneTime(sub.cycle);
+  const paidOn = sub.status === 'active' ? oneTimePaidOn(sub, today) : null;
 
   const onMarkPaid = () => {
     markPaid(sub.id, today);
@@ -127,10 +129,16 @@ export default function SubscriptionDetailScreen() {
             {cycleShortLabel(sub.cycle)}
           </AppText>
         </View>
-        <AppText variant="caption" tone="muted">
-          {cycleLabel(sub.cycle)} · {formatMoney(monthlyCost(sub.price, sub.cycle), sub.currency, languageTag)}/mo ·{' '}
-          {formatMoney(yearlyCost(sub.price, sub.cycle), sub.currency, languageTag)}/yr
-        </AppText>
+        {oneTime ? (
+          <AppText variant="caption" tone="muted">
+            One time payment, not part of your monthly totals
+          </AppText>
+        ) : (
+          <AppText variant="caption" tone="muted">
+            {cycleLabel(sub.cycle)} · {formatMoney(monthlyCost(sub.price, sub.cycle), sub.currency, languageTag)}/mo ·{' '}
+            {formatMoney(yearlyCost(sub.price, sub.cycle), sub.currency, languageTag)}/yr
+          </AppText>
+        )}
         {sub.amountVaries ? (
           <AppText variant="caption" tone="faint">
             Typical amount; the real one changes each time.
@@ -183,6 +191,27 @@ export default function SubscriptionDetailScreen() {
         </Card>
       ) : null}
 
+      {paidOn ? (
+        <Card style={{ marginTop: spacing.xl }} testID="paid-card">
+          <View style={styles.nextRow}>
+            <Ionicons name="checkmark-circle" size={28} color={colors.success} />
+            <View style={[styles.flex, { marginLeft: spacing.md }]}>
+              <AppText variant="small" tone="muted">
+                Paid
+              </AppText>
+              <AppText variant="h3" testID="paid-label">
+                {formatDate(paidOn, languageTag)}
+              </AppText>
+            </View>
+          </View>
+          {manual && sub.paidThrough ? (
+            <View style={[styles.payRow, { marginTop: spacing.md }]}>
+              <Button label="Undo" variant="secondary" onPress={() => undoPaid(sub.id)} testID="action-undo-paid" />
+            </View>
+          ) : null}
+        </Card>
+      ) : null}
+
       <SectionHeader title="Details" />
       <Card padded={false}>
         <Row title="Type" value={sub.kind === 'bill' ? '🧾 Bill' : '🔁 Subscription'} chevron={false} />
@@ -197,7 +226,11 @@ export default function SubscriptionDetailScreen() {
         ) : (
           <Row title="Paid so far" value={formatMoney(paid, sub.currency, languageTag)} chevron={false} />
         )}
-        <Row title={sub.kind === 'bill' ? 'First due date' : trial ? 'First paid bill' : 'First bill'} value={startDate ? formatDate(startDate, languageTag) : sub.firstBillDate} chevron={false} />
+        <Row
+          title={oneTime ? (sub.kind === 'bill' ? 'Due date' : 'Payment date') : sub.kind === 'bill' ? 'First due date' : trial ? 'First paid bill' : 'First bill'}
+          value={startDate ? formatDate(startDate, languageTag) : sub.firstBillDate}
+          chevron={false}
+        />
         <Row
           title="Reminder"
           value={
@@ -212,7 +245,7 @@ export default function SubscriptionDetailScreen() {
         <Row title="Notes" subtitle={sub.notes || 'No notes'} chevron={false} last />
       </Card>
 
-      {sub.status === 'active' ? (
+      {sub.status === 'active' && !oneTime ? (
         <>
           <SectionHeader title={sub.kind === 'bill' ? 'Upcoming due dates' : 'Upcoming charges'} />
           <Card padded={false} testID="upcoming-charges">

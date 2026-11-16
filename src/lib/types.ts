@@ -1,4 +1,5 @@
-export type CycleUnit = 'day' | 'week' | 'month' | 'year';
+/** 'once' is a one time payment: a single date, never repeated (its `every` is always 1). */
+export type CycleUnit = 'day' | 'week' | 'month' | 'year' | 'once';
 
 export interface BillingCycle {
   /** Number of units between bills, e.g. every 2 weeks. Always a positive integer. */
